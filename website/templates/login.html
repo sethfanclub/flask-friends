@@ -3,5 +3,15 @@
   <title>Friends - Login</title>
 {% endblock %}
 {% block content %} 
-  Login
+  <form class="mt-5" method="POST">
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input class="form-control" type="email" name="email" id="email" placeholder="Enter email">
+    </div>
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input class="form-control" type="password" name="password" id="password" placeholder="Enter password">
+    </div>
+    <button class="btn btn-primary mt-2" type="submit">Login</button>
+  </form>
 {% endblock %}

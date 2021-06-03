@@ -12,7 +12,6 @@ def home():
   return render_template('home.html')
 
 @views.route('/profile/<int:wall_id>', methods=['GET', 'POST'])
-@login_required
 def profile(wall_id):
   return render_template('profile.html')
 
