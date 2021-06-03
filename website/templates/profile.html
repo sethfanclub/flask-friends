@@ -1,0 +1,18 @@
+{% extends 'base.html' %} 
+{% block head %} 
+  <title>MySpace - Profile</title>
+{% endblock %}
+{% block content %} 
+  <div class="main-div">
+    <form action="/profile/{{wall_id}}" method="POST">
+      <textarea name="post-content" cols="30" rows="10"></textarea>
+      <input type="submit" value="Post">
+    </form>
+    {% for post in wall_posts %} 
+      <div>
+        {{post[1]}}
+      </div>
+      <hr>
+    {% endfor %}
+  </div>
+{% endblock %}

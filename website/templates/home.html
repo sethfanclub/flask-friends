@@ -1,0 +1,10 @@
+{% extends 'base.html' %} 
+{% block head %} 
+  <title>MySpace - Home</title>
+{% endblock %}
+{% block content %} 
+  {% if g.user %} 
+    <div id="current-user-tag">Currently logged in as {{g.user[1]}}</div>
+  {% endif %}
+  <div class="main-div">Hey how are ya</div>
+{% endblock %}
