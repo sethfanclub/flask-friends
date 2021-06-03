@@ -9,10 +9,13 @@ def create_app(config_file='settings.py'):
 
   from .views import views
   app.register_blueprint(views)
+  from .auth import auth
+  app.register_blueprint(auth)
 
   from .models import User
   db.create_all(app=app)
 
+  login_manager.login_view = 'auth.login'
   login_manager.init_app(app)
 
   @login_manager.user_loader

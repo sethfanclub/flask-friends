@@ -4,27 +4,36 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="{{url_for('static', filename='css/main.css')}}">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
   {% block head %}
-    <title>MySpace</title>
+    <title>Friends</title>
   {% endblock %}
 </head>
 <body>
-  <div class="navbar">
-    <div class="navlinks">
-      {% if g.user %} 
-       <a href="/">Home</a>
-       <a href="/profile/{{g.user[0]}}">Profile</a>
-       <a href="/logout">Logout</a>
-      {% else %}
-        <a href="/">Home</a>
-        <a href="/login">Login</a>
-      {% endif %}
+
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbar">
+      <div class="navbar-nav">
+        <a class="nav-item nav-link" href="/">Home</a>
+        {% if current_user.is_authenticated %} 
+        <a class="nav-item nav-link" href="/profile/{{current_user.id}}">Profile</a>
+        <a class="nav-item nav-link" href="/logout">logout</a>
+        {% else %}
+        <a class="nav-item nav-link" href="/login">Login</a>
+        <a class="nav-item nav-link" href="/register">Create Account</a>
+        {% endif %}
+      </div>
     </div>
-  </div>
-  <div class="content">
-    {% block content %}
+  </nav>
+
+  <div class="container">
+    {% block content %} 
     {% endblock %}
   </div>
+
 </body>
 </html>
