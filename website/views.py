@@ -14,5 +14,3 @@ def home():
 @views.route('/profile/<int:wall_id>', methods=['GET', 'POST'])
 def profile(wall_id):
   return render_template('profile.html')
-
-# Finish authentication processes using flask-login
