@@ -1,9 +1,8 @@
-from flask import Blueprint, request, redirect, render_template, flash
-from flask.helpers import url_for
+from flask import Blueprint, request, redirect, render_template, flash, url_for
 from flask_login import login_required, login_user, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from .models import User
+from .models import User, Wall
 from .extensions import db
 
 
@@ -26,7 +25,7 @@ def login():
       return redirect(url_for('views.home'))
     else:
       flash('Incorrect password', category='danger')
-      return redirect(url_for('views.home'))
+      return redirect(url_for('auth.login'))
 
   return render_template('login.html')
 
@@ -35,18 +34,32 @@ def register():
   if request.method == 'POST':
     if request.form['password1'] != request.form['password2']:
       flash('Passwords didn\'t match', category='danger')
-    else:
-      screen_name = request.form['screen-name']
-      email = request.form['email']
-      password = request.form['password2']
+      return redirect(url_for('auth.register'))
 
-      new_user = User(screen_name=screen_name, email=email, password=generate_password_hash(password))
-      db.session.add(new_user)
-      db.session.commit()
+    screen_name = request.form['screen-name']
+    email = request.form['email']
+    password = request.form['password2']
 
-      login_user(new_user, remember=False)
-      flash(f'Account created for {new_user.screen_name}!', category='success')
-      return redirect(url_for('views.home'))
+    rules = [
+      len(password) > 7,
+      any(char.isupper() for char in password),
+      any(char.islower() for char in password),
+      any(char.isdigit() for char in password)
+    ]
+
+    if not all(rules):
+      flash('Password must have one uppercase letter, one lower case letter, one number, and be at least 8 characters in length', category='danger')
+      return redirect(url_for('auth.register'))
+
+    new_user = User(screen_name=screen_name, email=email, password=generate_password_hash(password))
+    db.session.add(new_user)
+    user_wall = Wall(user_id=new_user.id)
+    db.session.add(user_wall)
+    db.session.commit()
+
+    login_user(new_user, remember=False)
+    flash(f'Account created for {new_user.screen_name}!', category='success')
+    return redirect(url_for('views.home'))
 
   return render_template('register.html')
 
