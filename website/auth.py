@@ -53,8 +53,6 @@ def register():
 
     new_user = User(screen_name=screen_name, email=email, password=generate_password_hash(password))
     db.session.add(new_user)
-    user_wall = Wall(user_id=new_user.id)
-    db.session.add(user_wall)
     db.session.commit()
 
     login_user(new_user, remember=False)
