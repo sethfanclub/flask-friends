@@ -1,4 +1,5 @@
 .vscode
+__pycache__
 db_info.yaml
 website/__pycache__
 env

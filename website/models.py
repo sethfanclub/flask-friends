@@ -1,4 +1,5 @@
 from flask_login import UserMixin
+from sqlalchemy.orm import backref
 from .extensions import db
 from datetime import datetime
 
@@ -7,7 +8,7 @@ class User(db.Model, UserMixin):
   screen_name = db.Column(db.String(20), nullable=False)
   email = db.Column(db.String(255), unique=True, nullable=False)
   password = db.Column(db.String(255), nullable=False)
-  wall = db.relationship('Wall', backref='user')
+  wall = db.relationship('Wall', cascade='all,delete')
   authored_posts = db.relationship('Post', backref='author', lazy=True)
 
   def __repr__(self):
@@ -15,12 +16,13 @@ class User(db.Model, UserMixin):
 
 class Wall(db.Model):
   id = db.Column(db.Integer, primary_key=True)
-  user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-  wall_posts = db.relationship('Post', backref='wall', lazy=True) # A wall post is a post on the user's wall/profile which can be created by any user
+  user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'))
+  user = db.relationship('User')
+  posts = db.relationship('Post', backref='wall', lazy=True, cascade="all,delete")
   
 class Post(db.Model):
   id = db.Column(db.Integer, primary_key=True)
   content = db.Column(db.String(10000), nullable=False)
   date_posted = db.Column(db.DateTime, default=datetime.utcnow())
-  author_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-  wall_id = db.Column(db.Integer, db.ForeignKey('wall.id'), nullable=False) # The wall_id refers to where (who's profile) the post was created at
+  author_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+  wall_id = db.Column(db.Integer, db.ForeignKey('wall.id')) # The wall id refers to which wall the post was created at

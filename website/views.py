@@ -12,25 +12,25 @@ views = Blueprint('views', __name__)
 def home():
   return render_template('home.html')
 
-@views.route('/profile/<int:wall_id>', methods=['GET', 'POST'])
-def profile(wall_id):
+@views.route('/profile/<int:user_id>', methods=['GET', 'POST'])
+def profile(user_id):
   if request.method == 'POST':
     post_content = request.form['post-content']
-    new_post = Post(content=post_content, author_id=current_user.id, wall_id=wall_id)
+    new_post = Post(content=post_content, author_id=current_user.id, wall_id=user_id)
     db.session.add(new_post)
     db.session.commit()
-    return redirect(url_for('views.profile', wall_id=wall_id))
-  wall = Wall.query.filter_by(user_id=wall_id).first()
+    return redirect(url_for('views.profile', user_id=user_id))
+  wall = Wall.query.filter_by(user_id=user_id).first()
   if not wall:
-    wall = Wall(user_id=wall_id)
+    wall = Wall(user_id=user_id)
     db.session.add(wall)
     db.session.commit()
   
-  user = User.query.get_or_404(wall_id)
-  posts = wall.wall_posts
+  user = User.query.get_or_404(user_id)
+  posts = wall.posts
 
   try:
-    is_wall_of_current_user = wall_id == current_user.id
+    is_wall_of_current_user = user_id == current_user.id
   except:
     is_wall_of_current_user = False
 
