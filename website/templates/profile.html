@@ -4,19 +4,21 @@
   <title>Friends - Profile</title>
 {% endblock %} 
 {% block content %} 
-  {% if is_wall_of_current_user %}
-    <span>
-      <h3 class="mt-5 mb-3" align="center">{{user.screen_name}}'s Profile</h3>
-      <a href="">Settings</a>
-    </span>
-  {% else %}
-    <span>
-      <h3 class="mt-5 mb-3" align="center">{{user.screen_name}}'s Profile</h3>
-    </span>
-  {% endif %}
+  <span>
+    <img src="{{ url_for('views.upload_image', filename='default.jpg') }}" alt="{{user.screen_name}}'s dynamic profile picture">
+    {% if is_wall_of_current_user %}
+      <h3 align="center" class="mt-5 mb-5">{{user.screen_name}}'s Profile <a href="/profile/settings">Settings</a></h3>
+    {% else %}
+      <h3 align="center" class="mt-5 mb-5">{{user.screen_name}}'s Profile</h3>
+    {% endif %}
+  </span>
   {% if current_user.is_authenticated %}
     <form method="POST">
-      <textarea style="resize:none;" class="form-control" name="post-content" cols="10" rows="5" placeholder="Share what's new..."></textarea>
+      {% if is_wall_of_current_user %}
+        <textarea style="resize:none;" class="form-control" name="post-content" cols="10" rows="5" placeholder="Share what's new..."></textarea>
+      {% else %} 
+        <textarea style="resize:none;" class="form-control" name="post-content" cols="10" rows="5" placeholder="Write to {{user.screen_name}}'s wall..."></textarea>
+      {% endif %}
       <button class="btn btn-primary mt-2" type="submit">Post</button>
     </form>
   {% endif %}

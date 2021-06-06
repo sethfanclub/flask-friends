@@ -1,4 +1,5 @@
-from flask import Blueprint, render_template, request
+from os import path
+from flask import Blueprint, render_template, request, send_from_directory
 from flask.helpers import url_for
 from werkzeug.utils import redirect
 from .models import User, Wall, Post
@@ -46,3 +47,11 @@ def profile(user_id):
   }
 
   return render_template('profile.html', **context)
+
+@views.route('/profile/settings')
+def settings():
+  return render_template('settings.html')
+
+@views.route('/file_uploads/images/<filename>')
+def upload_image(filename):
+  return send_from_directory('file_uploads/images', filename, environ=r'C:\Users\sethm\Desktop\Ongoing\friends\website\file_uploads')

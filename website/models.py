@@ -1,5 +1,4 @@
 from flask_login import UserMixin
-from sqlalchemy.orm import backref
 from .extensions import db
 from datetime import datetime
 
@@ -8,6 +7,7 @@ class User(db.Model, UserMixin):
   screen_name = db.Column(db.String(20), nullable=False)
   email = db.Column(db.String(255), unique=True, nullable=False)
   password = db.Column(db.String(255), nullable=False)
+  pic_url = db.Column(db.String(1000), default='default.jpg')
   wall = db.relationship('Wall', cascade='all,delete')
   authored_posts = db.relationship('Post', backref='author', lazy=True)
 
