@@ -2,7 +2,7 @@ from flask import Blueprint, request, redirect, render_template, flash, url_for
 from flask_login import login_required, login_user, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from .models import User, Wall
+from .models import User
 from .extensions import db
 
 
@@ -10,6 +10,11 @@ auth = Blueprint('auth', __name__)
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
+  data = request.form.values()
+  if not all(data):
+    flash('Input for all fields is required', category='danger')
+    return redirect(url_for('auth.register'))
+    
   if request.method == 'POST':
     email = request.form.get('email')
     password = request.form.get('password')
@@ -32,6 +37,11 @@ def login():
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
   if request.method == 'POST':
+    data = request.form.values()
+    if not all(data):
+      flash('Input for all fields is required', category='danger')
+      return redirect(url_for('auth.register'))
+      
     if request.form['password1'] != request.form['password2']:
       flash('Passwords didn\'t match', category='danger')
       return redirect(url_for('auth.register'))
