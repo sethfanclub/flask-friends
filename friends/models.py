@@ -26,3 +26,11 @@ class Post(db.Model):
   date_posted = db.Column(db.DateTime, default=datetime.utcnow())
   author_id = db.Column(db.Integer, db.ForeignKey('user.id'))
   wall_id = db.Column(db.Integer, db.ForeignKey('wall.id')) # The wall id refers to which wall the post was created at
+  comments = db.relationship('Comment', backref='post', lazy=True)
+
+class Comment(db.Model):
+  id = db.Column(db.Integer, primary_key=True)
+  content = db.Column(db.String(10000), nullable=False)
+  date_posted = db.Column(db.DateTime, default=datetime.utcnow())
+  author_id = db.Column(db.Integer, db.ForeignKey('wall.id'))
+  post_id = db.Column(db.Integer, db.ForeignKey('post.id'))

@@ -1,12 +1,13 @@
 from os import path, getcwd
 import uuid
-from flask import Blueprint, render_template, request, send_from_directory
+from flask import Blueprint, render_template, request, send_from_directory, jsonify
 from flask.helpers import url_for
 from flask_login.utils import login_required
 from werkzeug.utils import redirect
-from .models import User, Wall, Post
+from .models import User, Wall, Post, Comment
 from flask_login import current_user
 from .extensions import db
+import json
 
 
 views = Blueprint('views', __name__)
@@ -73,6 +74,21 @@ def settings():
 
     
   return render_template('settings.html')
+
+@views.route('/post-comment', methods=['POST'])
+@login_required
+def post_comment():
+  data = json.loads(request.data)
+  content = data['content']
+  post_id = data['postId']
+  author_id = data['authorId']
+
+  new_comment = Comment(content=content, post_id=post_id, author_id=author_id)
+
+  db.session.add(new_comment)
+  db.session.commit()
+
+  return jsonify({})
 
 @views.route('/file_uploads/images/<filename>')
 def get_image(filename):
