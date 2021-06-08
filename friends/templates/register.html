@@ -3,26 +3,33 @@
   <title>Friends - Register</title>
 {% endblock %} 
 {% block content %} 
-  <h3 class="mt-5" align="center">Create Account</h3>
-  <form method="POST">
-    <div class="form-group">
-      <label for="screen-name">Screen Name</label>
-      <input class="form-control" type="text" name="screen-name" id="screen-name" placeholder="Enter screen name">
+  <div class="row mt-5">
+    <div class="col-md-6 mx-auto mt-5 p-5 bg-light border">
+      <h3 align="center">Create Account</h3>
+      <form class="d-grid gap-2" method="POST">
+        <div class="form-group">
+          <label for="screen-name">Screen Name</label>
+          <input class="form-control" type="text" name="screen-name" id="screen-name" placeholder="Enter screen name">
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input class="form-control" type="email" name="email" id="email" placeholder="Enter email">
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input class="form-control" type="password" name="password1" id="password1" placeholder="Enter password">
+        </div>
+        <div class="form-group">
+          <label for="password">Password (again)</label>
+          <input class="form-control" type="password" name="password2" id="password2" placeholder="Confirm password">
+        </div>
+        <button class="btn btn-primary mt-3" type="submit">Register</button>
+        <div>
+          <small class="text-muted">Already Have An Account?
+            <a href="{{ url_for('auth.login') }}">Login Here</a>
+          </small>
+        </div>
+      </form>
     </div>
-    <div class="form-group">
-      <label for="email">Email</label>
-      <input class="form-control" type="email" name="email" id="email" placeholder="Enter email">
-    </div>
-    <div class="form-group">
-      <label for="password1">Password</label>
-      <input class="form-control" type="password" name="password1" id="password1" placeholder="Enter password">
-    </div>
-    <div class="form-group">
-      <label for="password2">Password (again)</label>
-      <input class="form-control" type="password" name="password2" id="password2" placeholder="Confirm password">
-    </div>
-    <div><small class="text-muted">Already Have An Account? <a href="{{ url_for('auth.login') }}">Login Here</a></small></div>
-    <br>
-    <button class="btn btn-primary" type="submit">Create Account</button>
-  </form>
+  </div>
 {% endblock %}

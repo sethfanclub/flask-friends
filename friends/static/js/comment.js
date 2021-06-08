@@ -1,6 +1,6 @@
-const commentBox = document.getElementById('comment-box')
-
 function postComment(wallId, postId, authorId) {
+  let commentBox = document.getElementById(`comment-box-${postId}`)
+  
   fetch("/post-comment", {
     method: "POST",
     body: JSON.stringify({ content: commentBox.value, postId: postId, authorId: authorId })

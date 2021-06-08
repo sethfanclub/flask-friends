@@ -4,56 +4,80 @@
   <title>Friends - Profile</title>
 {% endblock %} 
 {% block content %} 
-  <span>
-    {% if is_wall_of_current_user %}
-      <h3 align="center" class="mt-5 mb-5">
-        <img style="width:50px;" src="{{ url_for('views.get_image', filename=user.pic_id) }}" alt="Profile Picture">
-        {{user.screen_name}}'s Profile 
-        <a href="/profile/settings">Settings</a>
-      </h3>
-    {% else %}
-      <h3 align="center" class="mt-5 mb-5">
-        <img src="{{ url_for('views.get_image', filename=user.pic_id) }}" alt="Profile Picture" style="width:50px;">
-        {{user.screen_name}}'s Profile
-      </h3>
-    {% endif %}
-  </span>
-  {% if current_user.is_authenticated %}
-    <form method="POST">
+  <style>
+    img {display: block; max-width: 100%; height: auto;}
+    a {text-decoration: none;}
+    .order-reverse {display: flex; flex-direction: column-reverse;}
+  </style>
+
+  <div class="row m-5">
+    <div class="col bg-light position-relative p-5">
       {% if is_wall_of_current_user %}
-        <textarea style="resize:none;" class="form-control" name="post-content" cols="10" rows="5" placeholder="Share what's new..."></textarea>
-      {% else %} 
-        <textarea style="resize:none;" class="form-control" name="post-content" cols="10" rows="5" placeholder="Write to {{user.screen_name}}'s wall..."></textarea>
+        <!-- <img class="img-responsive" src="{{ url_for('views.get_image', filename=user.pic_id) }}" alt="Profile Picture"> -->
+        <div class="d-flex align-items-center justify-content-center gap-3">
+          <h3>{{user.screen_name}}'s Profile</h3>
+          <a class="position-absolute end-0 mx-5 p-3" href="/profile/settings">Settings</a>
+        </div>
+      {% else %}
+        <!-- <img class="img-responsive" src="{{ url_for('views.get_image', filename=user.pic_id) }}" alt="Profile Picture"> -->
+        <div class="d-flex align-items-center justify-content-center gap-3">
+          <h3>{{user.screen_name}}'s Profile</h3>
+        </div>
       {% endif %}
-      <button class="btn btn-primary mt-2" type="submit">Post</button>
-    </form>
-  {% endif %}
-  {% if posts %} 
-    <div class="mt-3 pb-5" style="display: flex; flex-direction: column-reverse;">
-      {% for post in posts %}
-        <div class="media">
-          <small>{{post.date_posted.strftime('%I:%M %p %A, %B %d, %Y')}}</small>
-          <div class="media-body">
-            <h5 class="mt-0">
-              <img class="mr-3" src="{{ url_for('views.get_image', filename=get_author(post.author_id).pic_id) }}" style="width:25px;" alt="Profile Picture">
-              <a href="/profile/{{post.author_id}}">{{get_author(post.author_id).screen_name}}</a>
-            </h5>
-            {{post.content}}
-          </div>
-          {% if current_user.is_authenticated %}
-            <input class="form-control" type="text" id="comment-box" placeholder="Add a comment...">
-            <button class="btn btn-secondary" type="button" 
-            onClick="postComment({{ wall.id }}, {{ post.id }}, {{ current_user.id }})"
-            >Comment</button>
+    </div>
+  </div>
+
+  <div class="row mx-5">
+    <div class="col bg-light p-5">
+      {% if current_user.is_authenticated %}
+        <form class="d-grid gap-3" method="POST">
+          {% if is_wall_of_current_user %}
+            <textarea style="resize:none;" class="form-control" name="post-content" cols="10" rows="5" placeholder="Share what's new..."></textarea>
+          {% else %}
+            <textarea style="resize:none;" class="form-control" name="post-content" cols="10" rows="5" placeholder="Write to {{user.screen_name}}'s wall..."></textarea>
           {% endif %}
-          {% for comment in post.comments %} 
-            <h4 style="color: lightgreen">{{comment.content}}</h4>
+          <button class="btn btn-primary mt-2" type="submit">Post</button>
+        </form>
+        <hr>
+      {% endif %}
+
+      {% if posts %}
+        <div class="order-reverse">
+          {% for post in posts %}
+            <div class="py-3">
+              <div class="d-flex align-items-center gap-2">
+                <a href="/profile/{{post.author_id}}">
+                  <h4>{{get_author(post.author_id).screen_name}}</h4>
+                </a>
+                <small class="text-muted">{{post.date_posted.strftime("%A, %b %d '%y")}}</small>
+              </div>
+              <div class="px-1">
+                {{post.content}}
+              </div>
+              <br>
+              {% if current_user.is_authenticated %}
+                <div class="d-grid gap-1">
+                  <input class="form-control w-50" type="text" id="comment-box-{{post.id}}">
+                  <button class="btn btn-secondary w-50" type="button"
+                  onclick="postComment({{ wall.id }}, {{ post.id }}, {{ current_user.id }})"
+                  >Add A Comment</button>
+                </div>
+              {% endif %}
+              <div class="order-reverse">
+                {% for comment in post.comments %}
+                  <div class="border-bottom p-2">
+                    <div class="d-flex gap-2">
+                      <a href="/profile/{{comment.author_id}}">{{get_author(comment.author_id).screen_name}}</a> {{comment.content}}
+                    </div>
+                    <small class="text-muted">{{comment.date_posted.strftime("%A, %b %d '%y")}}</small>
+                  </div>
+                {% endfor %}
+              </div>
+              <hr>
+            </div>
           {% endfor %}
         </div>
-        <hr>
-      {% endfor %}
+      {% endif %}
     </div>
-  {% else %}
-    <div>User has no posts!</div>
-  {% endif %}
+  </div>
 {% endblock %}
