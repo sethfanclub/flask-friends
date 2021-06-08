@@ -7,23 +7,30 @@
     <div class="col-md-6 mx-auto mt-5 p-5 bg-light border">
       <h3 align="center">Create Account</h3>
       <form class="d-grid gap-2" method="POST">
+        {{ form.hidden_tag() }}
         <div class="form-group">
-          <label for="screen-name">Screen Name</label>
-          <input class="form-control" type="text" name="screen-name" id="screen-name" placeholder="Enter screen name">
+          {{ form.screen_name.label() }}
+          {% if form.screen_name.errors %} 
+            {% for error in form.screen_name.errors %}
+              <span>{{ error }}</span>
+            {% endfor %} 
+          {% else %}
+            {{ form.screen_name(class="form-control", placeholder="Enter screen name") }}
+          {% endif %}
         </div>
         <div class="form-group">
-          <label for="email">Email</label>
-          <input class="form-control" type="email" name="email" id="email" placeholder="Enter email">
+          {{ form.email.label() }}
+          {{ form.email(class="form-control", placeholder="Enter email") }}
         </div>
         <div class="form-group">
-          <label for="password">Password</label>
-          <input class="form-control" type="password" name="password1" id="password1" placeholder="Enter password">
+          {{ form.password1.label() }}
+          {{ form.password1(class="form-control", placeholder="Enter password") }}
         </div>
         <div class="form-group">
-          <label for="password">Password (again)</label>
-          <input class="form-control" type="password" name="password2" id="password2" placeholder="Confirm password">
+          {{ form.password2.label() }}
+          {{ form.password2(class="form-control", placeholder="Confirm password") }}
         </div>
-        <button class="btn btn-primary mt-3" type="submit">Register</button>
+        {{ form.submit(class="btn btn-primary mt-3") }}
         <div>
           <small class="text-muted">Already Have An Account?
             <a href="{{ url_for('auth.login') }}">Login Here</a>

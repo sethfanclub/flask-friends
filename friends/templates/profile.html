@@ -5,22 +5,22 @@
 {% endblock %} 
 {% block content %} 
   <style>
-    img {display: block; max-width: 100%; height: auto;}
+    img {display: block; max-width: 100%; height: auto; object-fit: cover; border-radius: 50%;}
     a {text-decoration: none;}
     .order-reverse {display: flex; flex-direction: column-reverse;}
   </style>
 
   <div class="row m-5">
-    <div class="col bg-light position-relative p-5">
+    <div class="col-md-10 mx-auto bg-light position-relative p-5">
       {% if is_wall_of_current_user %}
-        <!-- <img class="img-responsive" src="{{ url_for('views.get_image', filename=user.pic_id) }}" alt="Profile Picture"> -->
         <div class="d-flex align-items-center justify-content-center gap-3">
+          <img style="width:50px; height:50px;"class="img-responsive" src="{{ url_for('views.get_image', filename=user.pic_id) }}" alt="Profile Picture">
           <h3>{{user.screen_name}}'s Profile</h3>
           <a class="position-absolute end-0 mx-5 p-3" href="/profile/settings">Settings</a>
         </div>
       {% else %}
-        <!-- <img class="img-responsive" src="{{ url_for('views.get_image', filename=user.pic_id) }}" alt="Profile Picture"> -->
         <div class="d-flex align-items-center justify-content-center gap-3">
+          <img style="width:50px; height:50px;"class="img-responsive" src="{{ url_for('views.get_image', filename=user.pic_id) }}" alt="Profile Picture">
           <h3>{{user.screen_name}}'s Profile</h3>
         </div>
       {% endif %}
@@ -28,7 +28,7 @@
   </div>
 
   <div class="row mx-5">
-    <div class="col bg-light p-5">
+    <div class="col-md-10 mx-auto bg-light p-5">
       {% if current_user.is_authenticated %}
         <form class="d-grid gap-3" method="POST">
           {% if is_wall_of_current_user %}
@@ -45,7 +45,8 @@
         <div class="order-reverse">
           {% for post in posts %}
             <div class="py-3">
-              <div class="d-flex align-items-center gap-2">
+              <div class="d-flex align-items-center gap-2 my-2">
+                <img style="width:30px; height:30px;"class="img-responsive" src="{{ url_for('views.get_image', filename=get_author(post.author_id).pic_id) }}" alt="Profile Picture">
                 <a href="/profile/{{post.author_id}}">
                   <h4>{{get_author(post.author_id).screen_name}}</h4>
                 </a>
@@ -56,9 +57,9 @@
               </div>
               <br>
               {% if current_user.is_authenticated %}
-                <div class="d-grid gap-1">
+                <div class="d-flex gap-1">
                   <input class="form-control w-50" type="text" id="comment-box-{{post.id}}">
-                  <button class="btn btn-secondary w-50" type="button"
+                  <button class="btn btn-secondary" type="button"
                   onclick="postComment({{ wall.id }}, {{ post.id }}, {{ current_user.id }})"
                   >Add A Comment</button>
                 </div>

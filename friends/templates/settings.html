@@ -3,20 +3,29 @@
   <title>Friends - Profile Settings</title>
 {% endblock %} 
 {% block content %} 
-  <h3 align="center" class="mt-5">Settings</h3>
-  <form method="POST" enctype="multipart/form-data">
-    <div class="form-group mb-3">
-      <label for="pic">Change Pic</label>
-      <input class="form-control" type="file" name="pic" id="pic" accept="image/*">
+  <style>
+    a {text-decoration: none;}
+  </style>
+
+  <div class="row mt-5">
+    <div class="col-md-6 mx-auto bg-light border mt-5 p-5 position-relative">
+      <a class="position-absolute top-0 start-0 m-2 p-2" href="/profile/{{current_user.id}}">&larr; Back</a>
+      <h3 align="center">Settings</h3>
+      <form class="d-grid gap-4" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+          <label for="pic">Change Pic</label>
+          <input class="form-control" type="file" name="pic" id="pic" accept="image/*">
+        </div>
+        <div class="form-group">
+          <label for="screen-name">Screen Name</label>
+          <input class="form-control" type="text" name="screen-name" id="screen-name" placeholder="Enter screen name">
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input class="form-control" type="email" name="email" id="email" placeholder="Enter email">
+        </div>
+        <input class="btn btn-primary mt-3" type="submit" value="Save Changes">
+      </form>
     </div>
-    <div class="form-group mb-3">
-      <label for="screen-name">Screen Name</label>
-      <input class="form-control" type="text" name="screen-name" id="screen-name" placeholder="Enter screen name">
-    </div>
-    <div class="form-group mb-3">
-      <label for="email">Email</label>
-      <input class="form-control" type="email" name="email" id="email" placeholder="Enter email">
-    </div>
-    <input class="btn btn-primary" type="submit" value="Save Changes">
-  </form>
+  </div>
 {% endblock %}

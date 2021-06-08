@@ -5,7 +5,5 @@ app = create_app()
 if __name__ == '__main__':
   app.run()
 
-# Continue style revamp with bootstrap
-# Error templates
-# Use WTForms
+# Finish wtforms errors and implement settings and login form
 # Let users message each other

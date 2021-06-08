@@ -3,6 +3,7 @@ from flask_login import login_required, login_user, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from .models import User
+from .forms import RegistrationForm
 from .extensions import db
 
 
@@ -36,40 +37,16 @@ def login():
 
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
-  if request.method == 'POST':
-    data = request.form.values()
-    if not all(data):
-      flash('Input for all fields is required', category='danger')
-      return redirect(url_for('auth.register'))
-      
-    if request.form['password1'] != request.form['password2']:
-      flash('Passwords didn\'t match', category='danger')
-      return redirect(url_for('auth.register'))
-
-    screen_name = request.form['screen-name']
-    email = request.form['email']
-    password = request.form['password2']
-
-    rules = [
-      len(password) > 7,
-      any(char.isupper() for char in password),
-      any(char.islower() for char in password),
-      any(char.isdigit() for char in password)
-    ]
-
-    if not all(rules):
-      flash('Password must have one uppercase letter, one lower case letter, one number, and be at least 8 characters in length', category='danger')
-      return redirect(url_for('auth.register'))
-
-    new_user = User(screen_name=screen_name, email=email, password=generate_password_hash(password))
+  form = RegistrationForm()
+  if form.validate_on_submit():
+    hashed_password = generate_password_hash(form.password2.data)
+    new_user = User(screen_name=form.screen_name.data, email=form.email.data, password=hashed_password)
     db.session.add(new_user)
     db.session.commit()
-
-    login_user(new_user, remember=False)
+    login_user(new_user)
     flash(f'Account created for {new_user.screen_name}!', category='success')
     return redirect(url_for('views.home'))
-
-  return render_template('register.html')
+  return render_template('register.html', form=form)
 
 @auth.route('/logout')
 @login_required
