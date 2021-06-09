@@ -1,4 +1,4 @@
-from os import path, getcwd
+from os import path, getcwd, chdir, remove
 import uuid
 from flask import Blueprint, render_template, request, send_from_directory, jsonify
 from flask.helpers import url_for
@@ -18,18 +18,13 @@ def home():
 
 @views.route('/profile/<int:user_id>', methods=['GET', 'POST'])
 def profile(user_id):
+  wall = Wall.query.filter_by(user_id=user_id).first()
   if request.method == 'POST':
     post_content = request.form['post-content']
-    new_post = Post(content=post_content, author_id=current_user.id, wall_id=user_id)
+    new_post = Post(content=post_content, author=current_user, wall=wall)
     db.session.add(new_post)
     db.session.commit()
     return redirect(url_for('views.profile', user_id=user_id))
-
-  wall = Wall.query.filter_by(user_id=user_id).first()
-  if not wall:
-    wall = Wall(user_id=user_id)
-    db.session.add(wall)
-    db.session.commit()
   
   user = User.query.get_or_404(user_id)
   posts = wall.posts
@@ -59,9 +54,10 @@ def settings():
   if request.method == 'POST':
     if request.files.get('pic'):
       pic = request.files['pic']
-      print(getcwd())
       pic_name = str(uuid.uuid1()) + path.splitext(pic.filename)[1]
       pic.save(f'friends/file_uploads/images/{pic_name}')
+      if user.pic_id:
+        remove(f'friends/file_uploads/images/{user.pic_id}')
       user.pic_id = pic_name
     if request.form.get('screen-name'):
       screen_name = request.form['screen-name']
@@ -70,22 +66,36 @@ def settings():
       email = request.form['email']
       user.email = email
     db.session.commit()
-    return redirect(url_for('views.settings'))
-
+    return redirect(url_for('views.profile', user_id=current_user.id))
     
   return render_template('settings.html')
 
-@views.route('/post-comment', methods=['POST'])
+@views.route('/add-comment', methods=['POST'])
 @login_required
-def post_comment():
+def add_comment():
   data = json.loads(request.data)
   content = data['content']
   post_id = data['postId']
-  author_id = data['authorId']
+  post = Post.query.get_or_404(post_id)
 
-  new_comment = Comment(content=content, post_id=post_id, author_id=author_id)
+  author_id = data['authorId']
+  author = User.query.get_or_404(author_id)
+
+  new_comment = Comment(content=content, post=post, author=author)
 
   db.session.add(new_comment)
+  db.session.commit()
+
+  return jsonify({})
+
+@views.route('/delete-post', methods=['POST'])
+@login_required
+def delete_post():
+  data = json.loads(request.data)
+  post_id = data['postId']
+
+  post = Post.query.get_or_404(post_id)
+  db.session.delete(post)
   db.session.commit()
 
   return jsonify({})

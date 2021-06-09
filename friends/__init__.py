@@ -2,7 +2,7 @@ from flask import Flask
 from .extensions import db, login_manager, migrate, toolbar
 
 
-def create_app(config_file='settings.py'):
+def create_app(config_file='config.py'):
   app = Flask(__name__)
   app.config.from_pyfile(config_file)
   app.debug = True

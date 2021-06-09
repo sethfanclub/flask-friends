@@ -1,6 +1,6 @@
 {% extends 'base.html' %} 
 {% block head %} 
-  <script defer src="{{ url_for('static', filename='js/comment.js') }}"></script>
+  <script defer src="{{ url_for('static', filename='js/profile.js') }}"></script>
   <title>Friends - Profile</title>
 {% endblock %} 
 {% block content %} 
@@ -11,24 +11,23 @@
   </style>
 
   <div class="row m-5">
-    <div class="col-md-10 mx-auto bg-light position-relative p-5">
-      {% if is_wall_of_current_user %}
-        <div class="d-flex align-items-center justify-content-center gap-3">
-          <img style="width:50px; height:50px;"class="img-responsive" src="{{ url_for('views.get_image', filename=user.pic_id) }}" alt="Profile Picture">
-          <h3>{{user.screen_name}}'s Profile</h3>
+    <div class="col-md-10 mx-auto bg-light border position-relative p-5">
+      <div class="d-flex align-items-center justify-content-center gap-3">
+        {% if user.pic_id %}
+          <img style="width:30px; height:30px;"class="img-responsive" src="{{ url_for('views.get_image', filename=user.pic_id) }}" alt="Profile Picture">
+        {% else %} 
+          <img style="width:30px; height:30px;"class="img-responsive" src="{{ url_for('static', filename='images/default.jpg') }}" alt="Profile Picture">
+        {% endif %}
+        <h3>{{user.screen_name}}'s Profile</h3>
+        {% if is_wall_of_current_user %}
           <a class="position-absolute end-0 mx-5 p-3" href="/profile/settings">Settings</a>
-        </div>
-      {% else %}
-        <div class="d-flex align-items-center justify-content-center gap-3">
-          <img style="width:50px; height:50px;"class="img-responsive" src="{{ url_for('views.get_image', filename=user.pic_id) }}" alt="Profile Picture">
-          <h3>{{user.screen_name}}'s Profile</h3>
-        </div>
-      {% endif %}
+        {% endif %}
+      </div>
     </div>
   </div>
 
   <div class="row mx-5">
-    <div class="col-md-10 mx-auto bg-light p-5">
+    <div class="col-md-10 mx-auto bg-light border p-5 mb-5">
       {% if current_user.is_authenticated %}
         <form class="d-grid gap-3" method="POST">
           {% if is_wall_of_current_user %}
@@ -42,11 +41,22 @@
       {% endif %}
 
       {% if posts %}
-        <div class="order-reverse">
+        <div class="order-reverse position-relative">
           {% for post in posts %}
             <div class="py-3">
+              {% if (post.author_id == current_user.id) or (wall.user_id == current_user.id) %}
+
+                <button class="btn text-danger position-absolute end-0" type="button" 
+                onclick="deletePost({{ wall.user_id }}, {{ post.id }}, )"
+                >Delete</button>
+
+              {% endif %}
               <div class="d-flex align-items-center gap-2 my-2">
-                <img style="width:30px; height:30px;"class="img-responsive" src="{{ url_for('views.get_image', filename=get_author(post.author_id).pic_id) }}" alt="Profile Picture">
+                {% if get_author(post.author_id).pic_id %}
+                  <img style="width:30px; height:30px;"class="img-responsive" src="{{ url_for('views.get_image', filename=get_author(post.author_id).pic_id) }}" alt="Profile Picture">
+                {% else %} 
+                  <img style="width:30px; height:30px;"class="img-responsive" src="{{ url_for('static', filename='images/default.jpg') }}" alt="Profile Picture">
+                {% endif %}
                 <a href="/profile/{{post.author_id}}">
                   <h4>{{get_author(post.author_id).screen_name}}</h4>
                 </a>
@@ -60,7 +70,7 @@
                 <div class="d-flex gap-1">
                   <input class="form-control w-50" type="text" id="comment-box-{{post.id}}">
                   <button class="btn btn-secondary" type="button"
-                  onclick="postComment({{ wall.id }}, {{ post.id }}, {{ current_user.id }})"
+                  onclick="addComment({{ wall.user_id }}, {{ post.id }}, {{ current_user.id }})"
                   >Add A Comment</button>
                 </div>
               {% endif %}
@@ -78,6 +88,8 @@
             </div>
           {% endfor %}
         </div>
+      {% else %} 
+        <h5 align="center" class="text-muted mt-5">No posts to show</h5>
       {% endif %}
     </div>
   </div>

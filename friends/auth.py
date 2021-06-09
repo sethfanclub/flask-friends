@@ -2,7 +2,7 @@ from flask import Blueprint, request, redirect, render_template, flash, url_for
 from flask_login import login_required, login_user, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from .models import User
+from .models import User, Wall
 from .forms import RegistrationForm
 from .extensions import db
 
@@ -41,10 +41,14 @@ def register():
   if form.validate_on_submit():
     hashed_password = generate_password_hash(form.password2.data)
     new_user = User(screen_name=form.screen_name.data, email=form.email.data, password=hashed_password)
+    new_wall = Wall(user=new_user)
+    
     db.session.add(new_user)
+    db.session.add(new_wall)
     db.session.commit()
+
     login_user(new_user)
-    flash(f'Account created for {new_user.screen_name}!', category='success')
+    flash(f'Account created for {form.screen_name.data}!', category='success')
     return redirect(url_for('views.home'))
   return render_template('register.html', form=form)
 

@@ -1,13 +1,12 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField
-from wtforms.fields.simple import SubmitField
-from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
+from wtforms import StringField, PasswordField, SubmitField
+from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Length
 from .models import User
 
 class RegistrationForm(FlaskForm):
-  screen_name = StringField('Screen Name', validators=[DataRequired()])
+  screen_name = StringField('Screen Name', validators=[DataRequired(), Length(max=20)])
   email = StringField('Email', validators=[DataRequired(), Email()])
-  password1 = PasswordField('Password', validators=[DataRequired()])
+  password1 = PasswordField('Password', validators=[DataRequired(), Length(min=8)])
   password2 = PasswordField('Password (again)', validators=[DataRequired(), EqualTo('password1')])
   submit = SubmitField('Register')
 
