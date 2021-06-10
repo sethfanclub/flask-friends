@@ -30,12 +30,26 @@
     <div class="col-md-10 mx-auto bg-light border p-5 mb-5">
       {% if current_user.is_authenticated %}
         <form class="d-grid gap-3" method="POST">
-          {% if is_wall_of_current_user %}
-            <textarea style="resize:none;" class="form-control" name="post-content" cols="10" rows="5" placeholder="Share what's new..."></textarea>
-          {% else %}
-            <textarea style="resize:none;" class="form-control" name="post-content" cols="10" rows="5" placeholder="Write to {{user.screen_name}}'s wall..."></textarea>
+          {{ form.hidden_tag() }}
+          {% if form.post_content.errors %}
+            {% if is_wall_of_current_user %}
+              {{ form.post_content(class="form-control is-invalid", cols="10", rows="5", placeholder="Share what's new...", style="resize:none") }}
+            {% else %}
+              {{ form.post_content(class="form-control is-invalid", cols="10", rows="5", placeholder="Write to " + user.screen_name + "'s wall...", style="resize:none") }}
+            {% endif %}
+            <div class="invalid-feedback">
+              {% for error in form.post_content.errors %}
+                <span>{{ error }}</span>
+              {% endfor %}
+            </div>
+          {% else %} 
+            {% if is_wall_of_current_user %}
+              {{ form.post_content(class="form-control", cols="10", rows="5", placeholder="Share what's new...", style="resize:none") }}
+            {% else %}
+              {{ form.post_content(class="form-control", cols="10", rows="5", placeholder="Write to " + user.screen_name + "'s wall...", style="resize:none") }}
+            {% endif %}
           {% endif %}
-          <button class="btn btn-primary mt-2" type="submit">Post</button>
+          {{ form.submit(class="btn btn-primary mt-2") }}
         </form>
         <hr>
       {% endif %}
@@ -45,11 +59,9 @@
           {% for post in posts %}
             <div class="py-3">
               {% if (post.author_id == current_user.id) or (wall.user_id == current_user.id) %}
-
                 <button class="btn text-danger position-absolute end-0" type="button" 
                 onclick="deletePost({{ wall.user_id }}, {{ post.id }}, )"
                 >Delete</button>
-
               {% endif %}
               <div class="d-flex align-items-center gap-2 my-2">
                 {% if get_author(post.author_id).pic_id %}

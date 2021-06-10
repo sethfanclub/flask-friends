@@ -12,19 +12,47 @@
       <a class="position-absolute top-0 start-0 m-2 p-2" href="/profile/{{current_user.id}}">&larr; Back</a>
       <h3 align="center">Settings</h3>
       <form class="d-grid gap-4" method="POST" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
         <div class="form-group">
-          <label for="pic">Change Pic</label>
-          <input class="form-control" type="file" name="pic" id="pic" accept="image/*">
+          {{ form.pic_upload.label() }}
+          {% if form.pic_upload.errors %} 
+            {{ form.pic_upload(class="form-control is-invalid", accept="image/*") }}
+            <div class="invalid-feedback">
+              {% for error in form.pic_upload.errors %}
+                <span>{{ error }}</span>
+              {% endfor %}
+            </div>
+          {% else %}
+            {{ form.pic_upload(class="form-control", accept="image/*") }}
+          {% endif %}
         </div>
         <div class="form-group">
-          <label for="screen-name">Screen Name</label>
-          <input class="form-control" type="text" name="screen-name" id="screen-name" placeholder="Enter screen name">
+          {{ form.screen_name.label() }}
+          {% if form.screen_name.errors %} 
+            {{ form.screen_name(class="form-control is-invalid", value=current_user.screen_name) }}
+            <div class="invalid-feedback">
+              {% for error in form.screen_name.errors %} 
+                <span>{{ error }}</span>
+              {% endfor %}
+            </div>
+          {% else %}
+            {{ form.screen_name(class="form-control", value=current_user.screen_name) }}
+          {% endif %}
         </div>
         <div class="form-group">
-          <label for="email">Email</label>
-          <input class="form-control" type="email" name="email" id="email" placeholder="Enter email">
+          {{ form.email.label() }}
+          {% if form.email.errors %} 
+            {{ form.email(class="form-control is-invalid", value=current_user.email) }}
+            <div class="invalid-feedback">
+              {% for error in form.email.errors %} 
+                <span>{{ error }}</span>
+              {% endfor %}
+            </div>
+          {% else %}
+            {{ form.email(class="form-control", value=current_user.email) }}
+          {% endif %}
         </div>
-        <input class="btn btn-primary mt-3" type="submit" value="Save Changes">
+        {{ form.submit(class="btn btn-primary mt-3") }}
       </form>
     </div>
   </div>

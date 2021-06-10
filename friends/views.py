@@ -1,13 +1,12 @@
-from os import path, getcwd, chdir, remove
+from flask_login import current_user, login_required
+from flask import Blueprint, render_template, request, send_from_directory, jsonify, url_for, redirect
+from os import path, remove
 import uuid
-from flask import Blueprint, render_template, request, send_from_directory, jsonify
-from flask.helpers import url_for
-from flask_login.utils import login_required
-from werkzeug.utils import redirect
-from .models import User, Wall, Post, Comment
-from flask_login import current_user
-from .extensions import db
 import json
+
+from .models import User, Wall, Post, Comment
+from .forms import PostForm, SettingsForm
+from .extensions import db
 
 
 views = Blueprint('views', __name__)
@@ -18,29 +17,30 @@ def home():
 
 @views.route('/profile/<int:user_id>', methods=['GET', 'POST'])
 def profile(user_id):
+  form = PostForm()
   wall = Wall.query.filter_by(user_id=user_id).first()
-  if request.method == 'POST':
-    post_content = request.form['post-content']
+  if form.validate_on_submit():
+    post_content = form.post_content.data
     new_post = Post(content=post_content, author=current_user, wall=wall)
     db.session.add(new_post)
     db.session.commit()
     return redirect(url_for('views.profile', user_id=user_id))
   
-  user = User.query.get_or_404(user_id)
-  posts = wall.posts
+  user = User.query.get_or_404(user_id) # is the user of the profile being viewed / not to be confused with current user
+
+  def get_author(author_id):
+    return User.query.get_or_404(author_id)
 
   try:
     is_wall_of_current_user = user_id == current_user.id
   except:
     is_wall_of_current_user = False
 
-  def get_author(author_id):
-    return User.query.get_or_404(author_id)
-
   context = {
+    'form': form,
     'user': user,
     'wall': wall,
-    'posts': posts,
+    'posts': wall.posts,
     'get_author': get_author,
     'is_wall_of_current_user': is_wall_of_current_user
   }
@@ -51,24 +51,25 @@ def profile(user_id):
 @login_required
 def settings():
   user = User.query.get_or_404(current_user.id)
-  if request.method == 'POST':
-    if request.files.get('pic'):
-      pic = request.files['pic']
+  form = SettingsForm()
+  if form.validate_on_submit():
+    if form.pic_upload.data:
+      pic = form.pic_upload.data
       pic_name = str(uuid.uuid1()) + path.splitext(pic.filename)[1]
       pic.save(f'friends/file_uploads/images/{pic_name}')
       if user.pic_id:
         remove(f'friends/file_uploads/images/{user.pic_id}')
       user.pic_id = pic_name
-    if request.form.get('screen-name'):
-      screen_name = request.form['screen-name']
+    if form.screen_name.data:
+      screen_name = form.screen_name.data
       user.screen_name = screen_name
-    if request.form.get('email'):
-      email = request.form['email']
+    if form.email.data:
+      email = form.email.data
       user.email = email
     db.session.commit()
     return redirect(url_for('views.profile', user_id=current_user.id))
-    
-  return render_template('settings.html')
+
+  return render_template('settings.html', form=form)
 
 @views.route('/add-comment', methods=['POST'])
 @login_required
