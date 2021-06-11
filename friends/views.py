@@ -1,11 +1,15 @@
+from flask.helpers import flash
+from friends.auth import login
 from flask_login import current_user, login_required
 from flask import Blueprint, render_template, request, send_from_directory, jsonify, url_for, redirect
 from os import path, remove
 import uuid
 import json
 
+from werkzeug.security import check_password_hash, generate_password_hash
+
 from .models import User, Wall, Post, Comment
-from .forms import PostForm, SettingsForm
+from .forms import PostForm, SettingsForm, ChangePasswordForm
 from .extensions import db
 
 
@@ -28,9 +32,6 @@ def wall(wall_id):
   
   user = wall.user # is the user of the wall being viewed / not to be confused with current user
 
-  def get_author(author_id):
-    return User.query.get_or_404(author_id)
-
   try:
     is_wall_of_current_user = user == current_user
   except:
@@ -41,7 +42,6 @@ def wall(wall_id):
     'user': user,
     'wall': wall,
     'posts': wall.posts,
-    'get_author': get_author,
     'is_wall_of_current_user': is_wall_of_current_user
   }
 
@@ -50,26 +50,44 @@ def wall(wall_id):
 @views.route('/wall/settings', methods=['GET', 'POST'])
 @login_required
 def settings():
-  user = User.query.get_or_404(current_user.id)
   form = SettingsForm()
   if form.validate_on_submit():
     if form.pic_upload.data:
       pic = form.pic_upload.data
       pic_name = str(uuid.uuid1()) + path.splitext(pic.filename)[1]
       pic.save(f'friends/file_uploads/images/{pic_name}')
-      if user.pic_id:
-        remove(f'friends/file_uploads/images/{user.pic_id}')
-      user.pic_id = pic_name
+      if current_user.pic_id:
+        remove(f'friends/file_uploads/images/{current_user.pic_id}')
+      current_user.pic_id = pic_name
     if form.screen_name.data:
       screen_name = form.screen_name.data
-      user.screen_name = screen_name
+      current_user.screen_name = screen_name
     if form.email.data:
       email = form.email.data
-      user.email = email
+      current_user.email = email
     db.session.commit()
     return redirect(url_for('views.wall', wall_id=current_user.wall.id))
 
   return render_template('settings.html', form=form)
+
+@views.route('/wall/settings/password', methods=['GET', 'POST'])
+@login_required
+def change_password():
+  form = ChangePasswordForm()
+  if form.validate_on_submit():
+    old_password = form.password1.data
+    authenticated = check_password_hash(current_user.password, old_password)
+    new_password = form.password2.data
+    if authenticated:
+      current_user.password = generate_password_hash(new_password)
+      db.session.commit()
+      flash('Password updated', category='success')
+      return redirect(url_for('views.settings'))
+    else:
+      flash('Old password was entered incorrectly', category='danger')
+      return redirect(url_for('views.change_password'))
+
+  return render_template('change_password.html', form=form)
 
 @views.route('/add-comment', methods=['POST'])
 @login_required
@@ -83,8 +101,19 @@ def add_comment():
   author = User.query.get_or_404(author_id)
 
   new_comment = Comment(content=content, post=post, author=author)
-
   db.session.add(new_comment)
+  db.session.commit()
+
+  return jsonify({})
+
+@views.route('/delete-comment', methods=['POST'])
+@login_required
+def delete_comment():
+  data = json.loads(request.data)
+  comment_id = data['commentId']
+  
+  comment = Comment.query.get_or_404(comment_id)
+  db.session.delete(comment)
   db.session.commit()
 
   return jsonify({})
@@ -102,6 +131,7 @@ def delete_post():
   return jsonify({})
 
 @views.route('/wall/edit-post/<int:post_id>', methods=['GET', 'POST'])
+@login_required
 def edit_post(post_id):
   post = Post.query.get_or_404(post_id)
   user = User.query.get_or_404(post.author_id)

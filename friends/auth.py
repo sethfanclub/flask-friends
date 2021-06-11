@@ -35,6 +35,7 @@ def login():
 def register():
   form = RegistrationForm()
   if form.validate_on_submit():
+    print('Validated')
     hashed_password = generate_password_hash(form.password2.data)
     new_user = User(screen_name=form.screen_name.data, email=form.email.data, password=hashed_password)
     new_wall = Wall(user=new_user)

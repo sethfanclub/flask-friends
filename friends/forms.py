@@ -1,8 +1,8 @@
-from flask import Flask
 from flask_wtf import FlaskForm
 from flask_login import current_user
+from werkzeug.security import check_password_hash
 from wtforms import StringField, PasswordField, SubmitField, TextAreaField, FileField
-from wtforms.validators import DataRequired, Email, EqualTo, InputRequired, ValidationError, Length
+from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Length
 from .models import User
 
 class RegistrationForm(FlaskForm):
@@ -13,7 +13,7 @@ class RegistrationForm(FlaskForm):
   submit = SubmitField('Register')
 
   def validate_email(self, email):
-    user = User.query.filter_by(email=email).first()
+    user = User.query.filter_by(email=email.data).first()
     if user == current_user:
       print('***\nVALID EMAIL\n***')
     elif user:
@@ -33,3 +33,9 @@ class SettingsForm(RegistrationForm):
   password1, password2 = None, None
   pic_upload = FileField('Change Pic')
   submit = SubmitField('Save Changes')
+
+class ChangePasswordForm(FlaskForm):
+  password1 = PasswordField('Old Password', validators=[DataRequired()])
+  password2 = PasswordField('New Password', validators=[DataRequired()])
+  password3 = PasswordField('New Password (again)', validators=[DataRequired(), EqualTo('password2')])
+  submit = SubmitField('Update Password')

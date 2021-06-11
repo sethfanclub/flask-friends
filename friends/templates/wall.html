@@ -1,25 +1,18 @@
 {% extends 'base.html' %} 
 {% block head %} 
   <script defer src="{{ url_for('static', filename='js/wall.js') }}"></script>
-  <title>Friends - wall</title>
+  <title>Friends - Wall</title>
 {% endblock %} 
 {% block content %} 
-  <style>
-    .order-reverse {display: flex; flex-direction: column-reverse;}
-    .hide {display: none;}
-    img {display: block; max-width: 100%; height: auto; object-fit: cover; border-radius: 50%;}
-    a {text-decoration: none;}
-  </style>
-
   <div class="row m-5">
     <div class="col-md-10 mx-auto bg-light border position-relative p-5">
-      <div class="d-flex align-items-center justify-content-center gap-3">
+      <div class="d-flex align-items-center justify-content-center gap-4">
         {% if user.pic_id %}
           <img style="width:30px; height:30px;"class="img-responsive" src="{{ url_for('views.get_image', filename=user.pic_id) }}" alt="wall Picture">
         {% else %} 
           <img style="width:30px; height:30px;"class="img-responsive" src="{{ url_for('static', filename='images/default.jpg') }}" alt="wall Picture">
         {% endif %}
-        <h3>{{user.screen_name}}'s wall</h3>
+        <h3>{{user.screen_name}}'s Wall</h3>
         {% if is_wall_of_current_user %}
           <a class="position-absolute end-0 mx-5 p-3" href="/wall/settings">Settings</a>
         {% endif %}
@@ -30,7 +23,7 @@
   <div class="row mx-5">
     <div class="col-md-10 mx-auto bg-light border p-5 mb-5">
       {% if current_user.is_authenticated %}
-        <form class="d-grid gap-3" method="POST">
+        <form class="d-grid gap-4" method="POST">
           {{ form.hidden_tag() }}
           {% if form.content.errors %}
             {% if is_wall_of_current_user %}
@@ -60,31 +53,33 @@
           {% for post in posts %}
             <div class="py-3">
               {% if (post.author_id == current_user.id) or (wall.user_id == current_user.id) %}
-                <div class="position-absolute end-0">
+                <div class="d-flex position-absolute end-0">
+                  <button class="btn text-info" type="button" 
+                  onclick=window.location.href="/wall/edit-post/{{post.id}}"
+                  >Edit</button>
                   <button style="display:block;" class="btn text-danger" type="button"
                   onclick="deletePost({{ wall.id }}, {{ post.id }}, )"
                   >Delete</button>
-                  <button class="btn text-info" type="button" onclick=window.location.href="/wall/edit-post/{{post.id}}">Edit</button>
                 </div>
               {% endif %}
               <div class="d-flex align-items-center gap-2 my-2">
-                {% if get_author(post.author_id).pic_id %}
-                  <img style="width:30px; height:30px;" class="img-responsive" src="{{ url_for('views.get_image', filename=get_author(post.author_id).pic_id) }}" alt="wall Picture">
+                {% if post.author.pic_id %}
+                  <img style="width:30px; height:30px;" class="img-responsive" src="{{ url_for('views.get_image', filename=post.author.pic_id) }}" alt="wall Picture">
                 {% else %} 
                   <img style="width:30px; height:30px;" class="img-responsive" src="{{ url_for('static', filename='images/default.jpg') }}" alt="wall Picture">
                 {% endif %}
-                <a href="/wall/{{post.author_id}}">
-                  <h4>{{get_author(post.author_id).screen_name}}</h4>
+                <a href="/wall/{{post.author.wall.id}}">
+                  <h4>{{post.author.screen_name}}</h4>
                 </a>
                 <small class="text-muted">{{post.date_posted.strftime("%A, %b %d '%y")}}</small>
               </div>
-              <div class="px-1">
+              <div class="mx-1">
                 {{post.content}}
               </div>
               <br>
               {% if current_user.is_authenticated %}
                 <div class="d-flex gap-1">
-                  <input class="form-control w-50" type="text" id="comment-box-{{post.id}}">
+                  <input class="form-control w-50" type="text" id="comment-input-{{post.id}}">
                   <button class="btn btn-secondary" type="button"
                   onclick="addComment({{ wall.id }}, {{ post.id }}, {{ current_user.id }})"
                   >Add A Comment</button>
@@ -94,9 +89,15 @@
                 {% for comment in post.comments %}
                   <div class="border-bottom p-2">
                     <div class="d-flex gap-2">
-                      <a href="/wall/{{comment.author_id}}">{{get_author(comment.author_id).screen_name}}</a> {{comment.content}}
+                      <a href="/wall/{{comment.author.wall.id}}">{{comment.author.screen_name}}</a> 
+                      {{comment.content}}
                     </div>
                     <small class="text-muted">{{comment.date_posted.strftime("%A, %b %d '%y")}}</small>
+                    {% if (comment.author == current_user) or (comment.post.wall.user == current_user) %}
+                      <button class="btn text-danger" type="button" onclick="deleteComment({{ wall.id }}, {{ comment.id }})">
+                        <small>Delete</small>
+                      </button>
+                    {% endif %}
                   </div>
                 {% endfor %}
               </div>
