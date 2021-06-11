@@ -15,24 +15,24 @@ views = Blueprint('views', __name__)
 def home():
   return render_template('home.html')
 
-@views.route('/profile/<int:user_id>', methods=['GET', 'POST'])
-def profile(user_id):
+@views.route('/wall/<int:wall_id>', methods=['GET', 'POST'])
+def wall(wall_id):
   form = PostForm()
-  wall = Wall.query.filter_by(user_id=user_id).first()
+  wall = Wall.query.get_or_404(wall_id)
   if form.validate_on_submit():
-    post_content = form.post_content.data
-    new_post = Post(content=post_content, author=current_user, wall=wall)
+    content = form.content.data
+    new_post = Post(content=content, author=current_user, wall=wall)
     db.session.add(new_post)
     db.session.commit()
-    return redirect(url_for('views.profile', user_id=user_id))
+    return redirect(url_for('views.wall', wall_id=wall_id))
   
-  user = User.query.get_or_404(user_id) # is the user of the profile being viewed / not to be confused with current user
+  user = wall.user # is the user of the wall being viewed / not to be confused with current user
 
   def get_author(author_id):
     return User.query.get_or_404(author_id)
 
   try:
-    is_wall_of_current_user = user_id == current_user.id
+    is_wall_of_current_user = user == current_user
   except:
     is_wall_of_current_user = False
 
@@ -45,9 +45,9 @@ def profile(user_id):
     'is_wall_of_current_user': is_wall_of_current_user
   }
 
-  return render_template('profile.html', **context)
+  return render_template('wall.html', **context)
 
-@views.route('/profile/settings', methods=['GET', 'POST'])
+@views.route('/wall/settings', methods=['GET', 'POST'])
 @login_required
 def settings():
   user = User.query.get_or_404(current_user.id)
@@ -67,7 +67,7 @@ def settings():
       email = form.email.data
       user.email = email
     db.session.commit()
-    return redirect(url_for('views.profile', user_id=current_user.id))
+    return redirect(url_for('views.wall', wall_id=current_user.wall.id))
 
   return render_template('settings.html', form=form)
 
@@ -100,6 +100,18 @@ def delete_post():
   db.session.commit()
 
   return jsonify({})
+
+@views.route('/wall/edit-post/<int:post_id>', methods=['GET', 'POST'])
+def edit_post(post_id):
+  post = Post.query.get_or_404(post_id)
+  user = User.query.get_or_404(post.author_id)
+  form = PostForm()
+  if form.validate_on_submit():
+    post.content = form.content.data
+    db.session.commit()
+    return redirect(url_for('views.wall', wall_id=user.wall.id))
+
+  return render_template('edit_post.html', post=post, form=form)
 
 @views.route('/file_uploads/images/<filename>')
 def get_image(filename):

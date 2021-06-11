@@ -26,7 +26,7 @@ class LoginForm(FlaskForm):
   submit = SubmitField('Login')
 
 class PostForm(FlaskForm):
-  post_content = TextAreaField(validators=[DataRequired()])
+  content = TextAreaField(validators=[DataRequired()])
   submit = SubmitField('Post')
 
 class SettingsForm(RegistrationForm):

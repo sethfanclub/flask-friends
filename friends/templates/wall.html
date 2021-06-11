@@ -1,26 +1,27 @@
 {% extends 'base.html' %} 
 {% block head %} 
-  <script defer src="{{ url_for('static', filename='js/profile.js') }}"></script>
-  <title>Friends - Profile</title>
+  <script defer src="{{ url_for('static', filename='js/wall.js') }}"></script>
+  <title>Friends - wall</title>
 {% endblock %} 
 {% block content %} 
   <style>
+    .order-reverse {display: flex; flex-direction: column-reverse;}
+    .hide {display: none;}
     img {display: block; max-width: 100%; height: auto; object-fit: cover; border-radius: 50%;}
     a {text-decoration: none;}
-    .order-reverse {display: flex; flex-direction: column-reverse;}
   </style>
 
   <div class="row m-5">
     <div class="col-md-10 mx-auto bg-light border position-relative p-5">
       <div class="d-flex align-items-center justify-content-center gap-3">
         {% if user.pic_id %}
-          <img style="width:30px; height:30px;"class="img-responsive" src="{{ url_for('views.get_image', filename=user.pic_id) }}" alt="Profile Picture">
+          <img style="width:30px; height:30px;"class="img-responsive" src="{{ url_for('views.get_image', filename=user.pic_id) }}" alt="wall Picture">
         {% else %} 
-          <img style="width:30px; height:30px;"class="img-responsive" src="{{ url_for('static', filename='images/default.jpg') }}" alt="Profile Picture">
+          <img style="width:30px; height:30px;"class="img-responsive" src="{{ url_for('static', filename='images/default.jpg') }}" alt="wall Picture">
         {% endif %}
-        <h3>{{user.screen_name}}'s Profile</h3>
+        <h3>{{user.screen_name}}'s wall</h3>
         {% if is_wall_of_current_user %}
-          <a class="position-absolute end-0 mx-5 p-3" href="/profile/settings">Settings</a>
+          <a class="position-absolute end-0 mx-5 p-3" href="/wall/settings">Settings</a>
         {% endif %}
       </div>
     </div>
@@ -31,22 +32,22 @@
       {% if current_user.is_authenticated %}
         <form class="d-grid gap-3" method="POST">
           {{ form.hidden_tag() }}
-          {% if form.post_content.errors %}
+          {% if form.content.errors %}
             {% if is_wall_of_current_user %}
-              {{ form.post_content(class="form-control is-invalid", cols="10", rows="5", placeholder="Share what's new...", style="resize:none") }}
+              {{ form.content(class="form-control is-invalid", cols="10", rows="5", placeholder="Share what's new...", style="resize:none") }}
             {% else %}
-              {{ form.post_content(class="form-control is-invalid", cols="10", rows="5", placeholder="Write to " + user.screen_name + "'s wall...", style="resize:none") }}
+              {{ form.content(class="form-control is-invalid", cols="10", rows="5", placeholder="Write to " + user.screen_name + "'s wall...", style="resize:none") }}
             {% endif %}
             <div class="invalid-feedback">
-              {% for error in form.post_content.errors %}
+              {% for error in form.content.errors %}
                 <span>{{ error }}</span>
               {% endfor %}
             </div>
           {% else %} 
             {% if is_wall_of_current_user %}
-              {{ form.post_content(class="form-control", cols="10", rows="5", placeholder="Share what's new...", style="resize:none") }}
+              {{ form.content(class="form-control", cols="10", rows="5", placeholder="Share what's new...", style="resize:none") }}
             {% else %}
-              {{ form.post_content(class="form-control", cols="10", rows="5", placeholder="Write to " + user.screen_name + "'s wall...", style="resize:none") }}
+              {{ form.content(class="form-control", cols="10", rows="5", placeholder="Write to " + user.screen_name + "'s wall...", style="resize:none") }}
             {% endif %}
           {% endif %}
           {{ form.submit(class="btn btn-primary mt-2") }}
@@ -59,17 +60,20 @@
           {% for post in posts %}
             <div class="py-3">
               {% if (post.author_id == current_user.id) or (wall.user_id == current_user.id) %}
-                <button class="btn text-danger position-absolute end-0" type="button" 
-                onclick="deletePost({{ wall.user_id }}, {{ post.id }}, )"
-                >Delete</button>
+                <div class="position-absolute end-0">
+                  <button style="display:block;" class="btn text-danger" type="button"
+                  onclick="deletePost({{ wall.id }}, {{ post.id }}, )"
+                  >Delete</button>
+                  <button class="btn text-info" type="button" onclick=window.location.href="/wall/edit-post/{{post.id}}">Edit</button>
+                </div>
               {% endif %}
               <div class="d-flex align-items-center gap-2 my-2">
                 {% if get_author(post.author_id).pic_id %}
-                  <img style="width:30px; height:30px;"class="img-responsive" src="{{ url_for('views.get_image', filename=get_author(post.author_id).pic_id) }}" alt="Profile Picture">
+                  <img style="width:30px; height:30px;" class="img-responsive" src="{{ url_for('views.get_image', filename=get_author(post.author_id).pic_id) }}" alt="wall Picture">
                 {% else %} 
-                  <img style="width:30px; height:30px;"class="img-responsive" src="{{ url_for('static', filename='images/default.jpg') }}" alt="Profile Picture">
+                  <img style="width:30px; height:30px;" class="img-responsive" src="{{ url_for('static', filename='images/default.jpg') }}" alt="wall Picture">
                 {% endif %}
-                <a href="/profile/{{post.author_id}}">
+                <a href="/wall/{{post.author_id}}">
                   <h4>{{get_author(post.author_id).screen_name}}</h4>
                 </a>
                 <small class="text-muted">{{post.date_posted.strftime("%A, %b %d '%y")}}</small>
@@ -82,7 +86,7 @@
                 <div class="d-flex gap-1">
                   <input class="form-control w-50" type="text" id="comment-box-{{post.id}}">
                   <button class="btn btn-secondary" type="button"
-                  onclick="addComment({{ wall.user_id }}, {{ post.id }}, {{ current_user.id }})"
+                  onclick="addComment({{ wall.id }}, {{ post.id }}, {{ current_user.id }})"
                   >Add A Comment</button>
                 </div>
               {% endif %}
@@ -90,7 +94,7 @@
                 {% for comment in post.comments %}
                   <div class="border-bottom p-2">
                     <div class="d-flex gap-2">
-                      <a href="/profile/{{comment.author_id}}">{{get_author(comment.author_id).screen_name}}</a> {{comment.content}}
+                      <a href="/wall/{{comment.author_id}}">{{get_author(comment.author_id).screen_name}}</a> {{comment.content}}
                     </div>
                     <small class="text-muted">{{comment.date_posted.strftime("%A, %b %d '%y")}}</small>
                   </div>

@@ -5,7 +5,7 @@ function addComment(wallId, postId, authorId) {
     method: "POST",
     body: JSON.stringify({ content: commentBox.value, postId: postId, authorId: authorId })
   }).then((_res) => {
-    window.location.href = `/profile/${wallId}`;
+    window.location.href = `/wall/${wallId}`;
   });
 }
 
@@ -14,6 +14,6 @@ function deletePost(wallId, postId) {
     method: "POST",
     body: JSON.stringify({ postId: postId })
   }).then((_res) => {
-    window.location.href = `/profile/${wallId}`;
+    window.location.href = `/wall/${wallId}`;
   });
 }

@@ -1,6 +1,6 @@
 {% extends 'base.html' %} 
 {% block head %} 
-  <title>Friends - Profile Settings</title>
+  <title>Friends - wall Settings</title>
 {% endblock %} 
 {% block content %} 
   <style>
@@ -9,7 +9,7 @@
 
   <div class="row mt-5">
     <div class="col-md-6 mx-auto bg-light border mt-5 p-5 position-relative">
-      <a class="position-absolute top-0 start-0 m-2 p-2" href="/profile/{{current_user.id}}">&larr; Back</a>
+      <a class="position-absolute top-0 start-0 m-2 p-2" href="/wall/{{current_user.id}}">&larr; Back</a>
       <h3 align="center">Settings</h3>
       <form class="d-grid gap-4" method="POST" enctype="multipart/form-data">
         {{ form.hidden_tag() }}

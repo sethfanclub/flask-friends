@@ -1,0 +1,25 @@
+{% extends 'base.html' %} 
+{% block content %} 
+  <div class="row m-5">
+    <div class="col-md-10 mx-auto bg-light border p-5 my-5">
+      <form class="d-grid gap-3" method="POST">
+        {{ form.hidden_tag() }}
+        {% if form.content.errors %}
+          <div class="invalid-feedback">
+            {{ form.content(class="form-control is-invalid") }}
+            {% for error in post.content.errors %}
+              <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+        {% else %}
+          {{ form.content(class="form-control", style="resize:none;", cols="10", rows="10", id="content-input") }}
+        {% endif %}
+        {{ form.submit(class="btn btn-primary mt-3", value="Save Changes") }}
+      </form>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("content-input").value = {{ post.content | tojson }}
+  </script>
+{% endblock %}
