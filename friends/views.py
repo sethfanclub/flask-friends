@@ -1,10 +1,10 @@
 from flask.helpers import flash
-from friends.auth import login
 from flask_login import current_user, login_required
 from flask import Blueprint, render_template, request, send_from_directory, jsonify, url_for, redirect
 from os import path, remove
 import uuid
 import json
+from datetime import datetime
 
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -138,6 +138,8 @@ def edit_post(post_id):
   form = PostForm()
   if form.validate_on_submit():
     post.content = form.content.data
+    post.date_posted = datetime.utcnow()
+    post.changes += 1
     db.session.commit()
     return redirect(url_for('views.wall', wall_id=user.wall.id))
 

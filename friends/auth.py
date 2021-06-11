@@ -3,7 +3,7 @@ from flask_login import login_required, login_user, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from .models import User, Wall
-from .forms import RegistrationForm, LoginForm
+from .forms import RegistrationForm, LoginForm, RequestResetForm
 from .extensions import db
 
 
@@ -55,3 +55,14 @@ def logout():
   logout_user()
   flash('You have been logged out', category='info')
   return redirect(url_for('views.home'))
+
+@auth.route('/forgot-password')
+def forgot_password():
+  form = RequestResetForm()
+  if form.validate_on_submit():
+    pass
+  return render_template('forgot_password.html', form=form)
+
+@auth.route('/send-password-reset')
+def send_password_reset():
+  return redirect(url_for('auth.login'))

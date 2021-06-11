@@ -71,7 +71,13 @@
                 <a href="/wall/{{post.author.wall.id}}">
                   <h4>{{post.author.screen_name}}</h4>
                 </a>
-                <small class="text-muted">{{post.date_posted.strftime("%A, %b %d '%y")}}</small>
+                <small class="text-muted">
+                  {% if post.changes %}
+                    <i>Edited</i> {{post.date_posted.strftime("%A, %b %d '%y, %I:%M %p")}}
+                  {% else %}
+                    {{post.date_posted.strftime("%A, %b %d '%y")}}
+                  {% endif %}
+                </small>
               </div>
               <div class="mx-1">
                 {{post.content}}

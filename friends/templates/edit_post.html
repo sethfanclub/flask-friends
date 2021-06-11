@@ -10,8 +10,8 @@
       <form class="d-grid gap-4" method="POST">
         {{ form.hidden_tag() }}
         {% if form.content.errors %}
+          {{ form.content(class="form-control is-invalid") }}
           <div class="invalid-feedback">
-            {{ form.content(class="form-control is-invalid") }}
             {% for error in post.content.errors %}
               <span>{{ error }}</span>
             {% endfor %}

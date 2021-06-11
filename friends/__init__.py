@@ -1,5 +1,5 @@
 from flask import Flask
-from .extensions import db, login_manager, migrate, toolbar
+from .extensions import db, login_manager, migrate, toolbar, mail
 
 
 def create_app(config_file='config.py'):
@@ -23,6 +23,8 @@ def create_app(config_file='config.py'):
   migrate.init_app(app, db)
 
   toolbar.init_app(app)
+
+  mail.init_app(app)
 
   @login_manager.user_loader
   def load_user(user_id):

@@ -39,3 +39,12 @@ class ChangePasswordForm(FlaskForm):
   password2 = PasswordField('New Password', validators=[DataRequired()])
   password3 = PasswordField('New Password (again)', validators=[DataRequired(), EqualTo('password2')])
   submit = SubmitField('Update Password')
+
+class RequestResetForm(FlaskForm):
+  email = StringField('Email', validators=[Email()])
+  submit = SubmitField(label=None)
+
+  def validate_email(self, email):
+    user_exists = User.query.filter_by(email=email.data).first()
+    if not user_exists:
+      raise ValidationError('No user is registered with that email')

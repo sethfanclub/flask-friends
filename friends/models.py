@@ -31,6 +31,7 @@ class Post(db.Model):
   author_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'))
   wall_id = db.Column(db.Integer, db.ForeignKey('wall.id', ondelete='CASCADE'))
   comments = db.relationship('Comment', backref='post')
+  changes = db.Column(db.Integer, default=0)
 
 class Comment(db.Model):
   __tablename__ = 'comment'
