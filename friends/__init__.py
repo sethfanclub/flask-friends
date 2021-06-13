@@ -9,8 +9,8 @@ def create_app(config_file='config.py'):
   db.init_app(app)
 
   from .views import views
-  app.register_blueprint(views)
   from .auth import auth
+  app.register_blueprint(views)
   app.register_blueprint(auth)
 
   from .models import User

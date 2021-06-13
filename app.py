@@ -4,8 +4,9 @@ app = create_app()
 
 if __name__ == '__main__':
   app.run(debug=True)
-  
-# Implement forgot password
+
+# Finish password reset  
 # Design home page
+# Let users post pictures
 # Let users message each other
 # Make site responsive

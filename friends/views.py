@@ -1,11 +1,9 @@
-from flask.helpers import flash
 from flask_login import current_user, login_required
-from flask import Blueprint, render_template, request, send_from_directory, jsonify, url_for, redirect
+from flask import Blueprint, render_template, request, send_from_directory, jsonify, url_for, redirect, flash
 from os import path, remove
 import uuid
 import json
 from datetime import datetime
-
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from .models import User, Wall, Post, Comment
@@ -17,7 +15,8 @@ views = Blueprint('views', __name__)
 
 @views.route('/')
 def home():
-  return render_template('home.html')
+  new_posts = Post.query.limit(5).all()
+  return render_template('home.html', new_posts=new_posts)
 
 @views.route('/wall/<int:wall_id>', methods=['GET', 'POST'])
 def wall(wall_id):

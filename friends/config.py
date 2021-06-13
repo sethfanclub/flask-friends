@@ -1,15 +1,15 @@
-import random, yaml
+import yaml, os
 
 
-SECRET_KEY = hex(random.getrandbits(64))[2:-1]
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
-DB_INFO = yaml.load(open("db_info.yaml"), Loader=yaml.FullLoader)
-SQLALCHEMY_DATABASE_URI = DB_INFO.get('uri')
+db_info = yaml.load(open("db_info.yaml"), Loader=yaml.FullLoader)
+SQLALCHEMY_DATABASE_URI = db_info.get('uri')
 SQLALCHEMY_TRACK_MODIFICATIONS = True
 
-MAIL_INFO = yaml.load(open("mail_info.yaml"), Loader=yaml.FullLoader)
+mail_info = yaml.load(open("mail_info.yaml"), Loader=yaml.FullLoader)
 MAIL_SERVER = 'smtp.googlemail.com'
 MAIL_PORT = 587
 MAIL_USE_TLS = True
-MAIL_USERNAME = MAIL_INFO.get('username')
-MAIL_PASSWORD = MAIL_INFO.get('password')
+MAIL_USERNAME = mail_info.get('username')
+MAIL_PASSWORD = mail_info.get('password')

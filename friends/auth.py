@@ -1,10 +1,11 @@
 from flask import Blueprint, request, redirect, render_template, flash, url_for
 from flask_login import login_required, login_user, logout_user
+from flask_mail import Message
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from .models import User, Wall
-from .forms import RegistrationForm, LoginForm, RequestResetForm
-from .extensions import db
+from .forms import ChangePasswordForm, RegistrationForm, LoginForm, RequestResetForm
+from .extensions import db, mail
 
 
 auth = Blueprint('auth', __name__)
@@ -56,13 +57,23 @@ def logout():
   flash('You have been logged out', category='info')
   return redirect(url_for('views.home'))
 
-@auth.route('/forgot-password')
+@auth.route('/reset-password', methods=['GET', 'POST'])
 def forgot_password():
   form = RequestResetForm()
   if form.validate_on_submit():
-    pass
+    user = User.query.filter_by(email=form.email.data)
+    token = user.get_reset_token()
+    msg = Message(subject="Friends - Password Reset", sender="noreply@friends.com", recipients=[user.email])
+    msg.body = f"Reset Password: {url_for('auth.reset_password', token=token, _external=True)}"
+    mail.send(msg)
+    flash('Reset Password Link was sent to email', category='success')
+    return redirect(url_for('auth.login'))
+
   return render_template('forgot_password.html', form=form)
 
-@auth.route('/send-password-reset')
-def send_password_reset():
-  return redirect(url_for('auth.login'))
+@auth.route('/reset-password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+  form = ChangePasswordForm()
+  if form.validate_on_submit():
+    pass
+  return render_template('reset_password.html', form=form)
