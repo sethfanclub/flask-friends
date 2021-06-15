@@ -4,7 +4,9 @@
 {% endblock %} 
 {% block content %} 
   <div class="row mt-5">
-    <div class="col-md-6 mx-auto bg-lighgt border p-5">
+    <div class="col-md-6 mx-auto bg-lighgt border p-5 position-relative">
+      <a class="position-absolute top-0 start-0 m-2 p-2" href="{{ url_for('users.login') }}">&larr; Back</a>
+      <h3 align="center" class="mb-3">Request Password Reset</h3>
       <form class="d-grid gap-3" method="POST">
         {{ form.hidden_tag() }}
         <div class="form-group">

@@ -9,14 +9,14 @@ def create_app(config_file='config.py'):
   db.init_app(app)
 
   from .views import views
-  from .auth import auth
+  from .users.routes import users
   app.register_blueprint(views)
-  app.register_blueprint(auth)
+  app.register_blueprint(users)
 
   from .models import User
   db.create_all(app=app)
 
-  login_manager.login_view = 'auth.login'
+  login_manager.login_view = 'users.login'
   login_manager.login_message_category = 'danger'
   login_manager.init_app(app)
 

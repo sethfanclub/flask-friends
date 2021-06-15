@@ -33,11 +33,11 @@
           {% else %}
             {{ form.password(class="form-control", placeholder="Enter password") }}
           {% endif %}
-          <small class="text-muted"><a href="/forgot-password">Forgot Pasword?</a></small>
+          <small class="text-muted"><a href="/reset-password">Forgot Pasword?</a></small>
         </div>
         {{ form.submit(class="btn btn-primary mt-3") }}
         <small class="text-muted">Need An Account?
-          <a href="{{ url_for('auth.register') }}">Create One Here</a>
+          <a href="{{ url_for('users.register') }}">Create One Here</a>
         </small>
       </form>
     </div>

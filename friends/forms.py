@@ -1,6 +1,5 @@
 from flask_wtf import FlaskForm
 from flask_login import current_user
-from werkzeug.security import check_password_hash
 from wtforms import StringField, PasswordField, SubmitField, TextAreaField, FileField
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Length
 from .models import User
@@ -48,3 +47,8 @@ class RequestResetForm(FlaskForm):
     user_exists = User.query.filter_by(email=email.data).first()
     if not user_exists:
       raise ValidationError('No user is registered with that email')
+      
+class ResetPasswordForm(FlaskForm):
+  password1 = PasswordField('New Password', validators=[DataRequired(), Length(min=8)])
+  password2 = PasswordField('New Password (again)', validators=[DataRequired(), EqualTo('password1')])
+  submit = SubmitField('Update Password')
