@@ -14,7 +14,7 @@ users = Blueprint('users', __name__)
 
 @users.route('/login', methods=['GET', 'POST'])
 def login():
-  if current_user.is_usersenticated:
+  if current_user.is_authenticated:
     return redirect(url_for('views.home'))
   form = LoginForm()
   if form.validate_on_submit():
@@ -38,7 +38,7 @@ def login():
 
 @users.route('/register', methods=['GET', 'POST'])
 def register():
-  if current_user.is_usersenticated:
+  if current_user.is_authenticated:
     return redirect(url_for('views.home'))
   form = RegistrationForm()
   if form.validate_on_submit():
@@ -85,7 +85,7 @@ def request_reset():
 
 @users.route('/reset-password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
-  if current_user.is_usersenticated:
+  if current_user.is_authenticated:
     return redirect(url_for('views.home'))
   user = User.verify_reset_token(token)
   if not user:
@@ -136,7 +136,7 @@ def change_password():
       current_user.password = generate_password_hash(new_password)
       db.session.commit()
       flash('Password updated', category='success')
-      return redirect(url_for('views.settings'))
+      return redirect(url_for('users.settings'))
     else:
       flash('Old password was entered incorrectly', category='danger')
       return redirect(url_for('views.change_password'))

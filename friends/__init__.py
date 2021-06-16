@@ -1,5 +1,5 @@
 from flask import Flask
-from .extensions import db, login_manager, migrate, toolbar, mail
+from .extensions import db, login_manager, migrate, toolbar, mail, socketio
 
 
 def create_app(config_file='config.py'):
@@ -25,6 +25,8 @@ def create_app(config_file='config.py'):
   toolbar.init_app(app)
 
   mail.init_app(app)
+
+  socketio.init_app(app)
 
   @login_manager.user_loader
   def load_user(user_id):

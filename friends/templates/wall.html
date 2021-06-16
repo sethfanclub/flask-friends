@@ -14,7 +14,7 @@
         {% endif %}
         <h3>{{user.screen_name}}'s Wall</h3>
         {% if is_wall_of_current_user %}
-          <a class="position-absolute end-0 mx-5 p-3" href="{{ url_for('views.settings') }}">Settings</a>
+          <a class="position-absolute end-0 mx-5 p-3" href="{{ url_for('users.settings') }}">Settings</a>
         {% else %} 
           <a class="position-absolute start-0 mx-5 p-3" href="">Message</a>
         {% endif %}
