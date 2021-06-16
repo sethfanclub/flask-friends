@@ -1,12 +1,13 @@
-from flask import Blueprint, request, redirect, render_template, flash, url_for
+from flask import Blueprint, request, redirect, render_template, flash, url_for, send_from_directory
 from flask_login import login_required, login_user, logout_user, current_user
 from flask_mail import Message
 from werkzeug.security import generate_password_hash, check_password_hash
 import uuid
 from os import path, remove
 
-from ..models import User, Wall
-from ..forms import SettingsForm, ChangePasswordForm, RegistrationForm, LoginForm, RequestResetForm, ResetPasswordForm
+from .models import User
+from ..posts.models import Wall
+from .forms import SettingsForm, ChangePasswordForm, RegistrationForm, LoginForm, RequestResetForm, ResetPasswordForm
 from ..extensions import db, mail
 
 
@@ -15,7 +16,7 @@ users = Blueprint('users', __name__)
 @users.route('/login', methods=['GET', 'POST'])
 def login():
   if current_user.is_authenticated:
-    return redirect(url_for('views.home'))
+    return redirect(url_for('main.home'))
   form = LoginForm()
   if form.validate_on_submit():
     email = form.email.data
@@ -29,7 +30,7 @@ def login():
     if check_password_hash(user.password, password):
       login_user(user)
       flash(f'Successfully logged in as {user.screen_name}!', category='success')
-      return redirect(url_for('views.home'))
+      return redirect(url_for('main.home'))
     else:
       flash(f'Incorrect password', category='danger')
       return redirect(url_for('users.login'))
@@ -39,7 +40,7 @@ def login():
 @users.route('/register', methods=['GET', 'POST'])
 def register():
   if current_user.is_authenticated:
-    return redirect(url_for('views.home'))
+    return redirect(url_for('main.home'))
   form = RegistrationForm()
   if form.validate_on_submit():
     print('Validated')
@@ -53,7 +54,7 @@ def register():
 
     login_user(new_user)
     flash(f'Account created for {form.screen_name.data}!', category='success')
-    return redirect(url_for('views.home'))
+    return redirect(url_for('main.home'))
   return render_template('register.html', form=form)
 
 @users.route('/logout')
@@ -61,12 +62,12 @@ def register():
 def logout():
   logout_user()
   flash('You have been logged out', category='info')
-  return redirect(url_for('views.home'))
+  return redirect(url_for('main.home'))
 
 @users.route('/reset-password', methods=['GET', 'POST'])
 def request_reset():
   if current_user.is_authenticated:
-    return redirect(url_for('views.home'))
+    return redirect(url_for('main.home'))
   form = RequestResetForm()
   if form.validate_on_submit():
     user = User.query.filter_by(email=form.email.data).first()
@@ -86,7 +87,7 @@ def request_reset():
 @users.route('/reset-password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
   if current_user.is_authenticated:
-    return redirect(url_for('views.home'))
+    return redirect(url_for('main.home'))
   user = User.verify_reset_token(token)
   if not user:
     flash('Token was invalid or expired', category='danger')
@@ -120,7 +121,7 @@ def settings():
       email = form.email.data
       current_user.email = email
     db.session.commit()
-    return redirect(url_for('views.wall', wall_id=current_user.wall.id))
+    return redirect(url_for('posts.wall', wall_id=current_user.wall.id))
 
   return render_template('settings.html', form=form)
 
@@ -142,3 +143,8 @@ def change_password():
       return redirect(url_for('views.change_password'))
 
   return render_template('change_password.html', form=form)
+
+
+@users.route('/file_uploads/images/<filename>')
+def get_image(filename):
+  return send_from_directory('file_uploads/images', filename)  

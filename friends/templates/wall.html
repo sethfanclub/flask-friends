@@ -8,7 +8,7 @@
     <div class="col-md-10 mx-auto bg-light border position-relative p-5">
       <div class="d-flex align-items-center justify-content-center gap-4">
         {% if user.pic_id %}
-          <img style="width:30px; height:30px;"class="img-responsive" src="{{ url_for('views.get_image', filename=user.pic_id) }}" alt="wall Picture">
+          <img style="width:30px; height:30px;"class="img-responsive" src="{{ url_for('users.get_image', filename=user.pic_id) }}" alt="wall Picture">
         {% else %} 
           <img style="width:30px; height:30px;"class="img-responsive" src="{{ url_for('static', filename='images/default.jpg') }}" alt="wall Picture">
         {% endif %}
@@ -66,7 +66,7 @@
               {% endif %}
               <div class="d-flex align-items-center gap-2 my-2">
                 {% if post.author.pic_id %}
-                  <img style="width:30px; height:30px;" class="img-responsive" src="{{ url_for('views.get_image', filename=post.author.pic_id) }}" alt="wall Picture">
+                  <img style="width:30px; height:30px;" class="img-responsive" src="{{ url_for('users.get_image', filename=post.author.pic_id) }}" alt="wall Picture">
                 {% else %} 
                   <img style="width:30px; height:30px;" class="img-responsive" src="{{ url_for('static', filename='images/default.jpg') }}" alt="wall Picture">
                 {% endif %}

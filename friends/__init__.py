@@ -1,19 +1,23 @@
 from flask import Flask
+from .users.models import User
 from .extensions import db, login_manager, migrate, toolbar, mail, socketio
 
 
-def create_app(config_file='config.py'):
+def create_app(config_file='config.py', debug=False):
   app = Flask(__name__)
   app.config.from_pyfile(config_file)
-  app.debug = True
-  db.init_app(app)
+  app.debug = debug
 
-  from .views import views
+  from .main.routes import main
   from .users.routes import users
-  app.register_blueprint(views)
+  from .posts.routes import posts
+  from .chat.routes import chat
+  app.register_blueprint(main)
   app.register_blueprint(users)
+  app.register_blueprint(posts)
+  app.register_blueprint(chat)
 
-  from .models import User
+  db.init_app(app)
   db.create_all(app=app)
 
   login_manager.login_view = 'users.login'

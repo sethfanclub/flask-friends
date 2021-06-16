@@ -1,8 +1,9 @@
 from flask_wtf import FlaskForm
 from flask_login import current_user
-from wtforms import StringField, PasswordField, SubmitField, TextAreaField, FileField
+from wtforms import StringField, PasswordField, SubmitField, FileField
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Length
 from .models import User
+
 
 class RegistrationForm(FlaskForm):
   screen_name = StringField('Screen Name', validators=[DataRequired(), Length(max=20)])
@@ -23,10 +24,6 @@ class LoginForm(FlaskForm):
   email = StringField('Email', validators=[DataRequired()])
   password = PasswordField('Password', validators=[DataRequired()])
   submit = SubmitField('Login')
-
-class PostForm(FlaskForm):
-  content = TextAreaField(validators=[DataRequired()])
-  submit = SubmitField('Post')
 
 class SettingsForm(RegistrationForm):
   password1, password2 = None, None

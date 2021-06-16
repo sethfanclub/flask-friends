@@ -1,13 +1,39 @@
 from flask import Blueprint, request, redirect, render_template, jsonify, url_for
 from flask_login import login_required, current_user
-from ..models import User, Post, Comment, Wall
-from ..forms import PostForm
+from .models import Post, Comment, Wall
+from ..users.models import User
+from .forms import PostForm
 from ..extensions import db
 import json
 from datetime import datetime
 
+
 posts = Blueprint('posts', __name__)
 
+@posts.route('/wall/<int:wall_id>', methods=['GET', 'POST'])
+def wall(wall_id):
+  form = PostForm()
+  wall = Wall.query.get_or_404(wall_id)
+  if form.validate_on_submit():
+    content = form.content.data
+    new_post = Post(content=content, author=current_user, wall=wall)
+    db.session.add(new_post)
+    db.session.commit()
+    return redirect(url_for('posts.wall', wall_id=wall_id))
+  
+  user = wall.user # user of wall being viewed
+  try:
+    is_wall_of_current_user = user == current_user
+  except:
+    is_wall_of_current_user = False
+  context = {
+    'form': form,
+    'user': user,
+    'wall': wall,
+    'posts': wall.posts,
+    'is_wall_of_current_user': is_wall_of_current_user
+  }
+  return render_template('wall.html', **context)
 
 @posts.route('/add-comment', methods=['POST'])
 @login_required

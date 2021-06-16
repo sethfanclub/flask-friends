@@ -1,25 +1,26 @@
-{% extends 'base.html' %} 
-{% block head %} 
-  <title>Friends - Chatroom</title>
-{% endblock %}
-{% block content %}
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
-  <script type="text/javascript" charset="utf-8">
-    let messageContainer = document.getElementById('message-container')
-    let messageInput = document.getElementById('send-message')
-    var socket = io.connect('http://127.0.0.1:5000')
-
-    socket.on('message', function(message) {
-      newMessage = document.createElement('li')
-      newMessage.innerHTML = message
-      messageContainer.appendChild(newMessage)
-    })
-
-    messageInput.on('click', function() {
-      socket.send(messageInput.value)
-      messageInput.value = ''
-    })
-  </script>
-  <ul id="message-container"></ul>
-  <input type="text" name="send-message" id="send-message">
-{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8">
+      <title>SocketIO example</title>
+      <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
+      <script type="text/javascript">
+         $(document).ready(function() {
+         
+           // sending a connect request to the server.
+           var socket = io.connect('http://localhost:5000/chatroom');
+         
+           socket.on('after connect', function(msg) {
+               console.log('After connect', msg);
+               $('#log').append('<br>' + $('<div/>').text('Received: ' + msg.data).html());
+          });        
+         });
+      </script>
+   </head>
+   <body>
+    <h1>SocketIO Example</h1>
+    <h2>Receive:</h2>
+    <div id="log"></div>
+   </body>
+</html>
