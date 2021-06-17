@@ -4,7 +4,7 @@ from friends.extensions import socketio
 app = create_app(debug=True)
 
 if __name__ == '__main__':
-  socketio.run(app)
+  socketio.run(app=app)
 
 # finish chat app
 # Let users post pictures

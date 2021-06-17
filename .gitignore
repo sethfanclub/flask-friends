@@ -1,5 +1,6 @@
 .vscode
 __pycache__
+migrations
 db_info.yaml
 mail_info.yaml
 website/__pycache__
