@@ -1,26 +1,38 @@
-<!DOCTYPE html>
-<html lang="en">
-   <head>
-      <meta charset="UTF-8">
-      <title>SocketIO example</title>
-      <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
-      <script type="text/javascript">
-         $(document).ready(function() {
+{% extends 'base.html' %}
+{% block head %} 
+   <title>Friends - Chatroom</title>
+   <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
+   <script type="text/javascript">
+      var socket = io.connect('http://localhost:5000/chatroom');
+      $(document).ready(function() {   
+         socket.on('message', function(msg) {
+            $('#messages').append('<li>'+msg+'</li>')
+         })
          
-           // sending a connect request to the server.
-           var socket = io.connect('http://localhost:5000/chatroom');
-         
-           socket.on('after connect', function(msg) {
-               console.log('After connect', msg);
-               $('#log').append('<br>' + $('<div/>').text('Received: ' + msg.data).html());
-          });        
+         socket.on('after connect', function() {
+            socket.send('User has connected')
          });
-      </script>
-   </head>
-   <body>
-    <h1>SocketIO Example</h1>
-    <h2>Receive:</h2>
-    <div id="log"></div>
-   </body>
-</html>
+
+         $('#message-submit').on('click', function() {
+            socket.send($('#message-input').val())
+            $('#message-input').val('')
+         })         
+      });
+   </script>
+{% endblock %} 
+{% block content %} 
+   <style>
+      ul {margin:0; padding:0;}
+      li {list-style-type:none;}
+   </style>
+   <div class="row mt-5">
+      <div class="col-md-6 mx-auto bg-light border p-5 position-relative">
+         <ul class="my-2" id="messages"></ul>
+         <div class="d-flex gap-0">
+            <input class="form-control" type="text" id="message-input">
+            <button class="btn btn-primary" type="button" id="message-submit">Send</button>
+         </div>
+      </div>
+   </div>
+{% endblock %}

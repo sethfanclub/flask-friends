@@ -1,3 +1,4 @@
+from . import events
 from flask import Blueprint, render_template
 
 
