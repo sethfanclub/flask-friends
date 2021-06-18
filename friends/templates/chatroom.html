@@ -4,17 +4,23 @@
    <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
    <script type="text/javascript">
-      var socket;
+      var socket
       $(document).ready(function() {   
-         socket = io.connect('http://localhost:5000/chatroom');
+         socket = io.connect('http://localhost:5000/chatroom')
+
+         socket.on('connect', function() {
+            socket.emit('message', {'msg': 'User has connected'})
+         })
+
          socket.on('message', function(data) {
             $('#messages').append('<li>'+data.msg+'</li>')
-         });
+         })
+
          $('#message-send').on('click', function() {
-            socket.emit('send message', { msg: $('#message-input').val() })
+            socket.emit('message', {msg: $('#message-input').val()})
             $('#message-input').val('')
-         });
-      });
+         })
+      })
    </script>
 {% endblock %} 
 {% block content %} 

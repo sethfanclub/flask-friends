@@ -22,6 +22,9 @@ def create_app(config_file='config.py', debug=False):
 
   login_manager.login_view = 'users.login'
   login_manager.login_message_category = 'danger'
+  @login_manager.user_loader
+  def load_user(user_id):
+    return User.query.get(user_id)
   login_manager.init_app(app)
 
   migrate.init_app(app, db)
@@ -31,9 +34,5 @@ def create_app(config_file='config.py', debug=False):
   mail.init_app(app)
 
   socketio.init_app(app)
-
-  @login_manager.user_loader
-  def load_user(user_id):
-    return User.query.get(user_id)
 
   return app
