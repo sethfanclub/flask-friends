@@ -4,20 +4,16 @@
    <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
    <script type="text/javascript">
-      var socket = io.connect('http://localhost:5000/chatroom');
+      var socket;
       $(document).ready(function() {   
-         socket.on('message', function(msg) {
-            $('#messages').append('<li>'+msg+'</li>')
-         })
-         
-         socket.on('after connect', function() {
-            socket.send('User has connected')
+         socket = io.connect('http://localhost:5000/chatroom');
+         socket.on('message', function(data) {
+            $('#messages').append('<li>'+data.msg+'</li>')
          });
-
-         $('#message-submit').on('click', function() {
-            socket.send($('#message-input').val())
+         $('#message-send').on('click', function() {
+            socket.emit('send message', { msg: $('#message-input').val() })
             $('#message-input').val('')
-         })         
+         });
       });
    </script>
 {% endblock %} 
@@ -31,7 +27,7 @@
          <ul class="my-2" id="messages"></ul>
          <div class="d-flex gap-0">
             <input class="form-control" type="text" id="message-input">
-            <button class="btn btn-primary" type="button" id="message-submit">Send</button>
+            <button id="message-send" class="btn btn-primary" type="button">Send</button>
          </div>
       </div>
    </div>
