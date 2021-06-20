@@ -1,4 +1,12 @@
-from flask import Blueprint, redirect, render_template, flash, url_for, send_from_directory
+from flask import (
+  Blueprint, 
+  redirect, 
+  render_template, 
+  flash, 
+  url_for, 
+  send_from_directory, 
+  request
+)
 from flask_login import login_required, login_user, logout_user, current_user
 from flask_mail import Message
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -8,7 +16,7 @@ from os import path, remove
 from .models import User
 from ..posts.models import Wall
 from .forms import SettingsForm, ChangePasswordForm, RegistrationForm, LoginForm, RequestResetForm, ResetPasswordForm
-from ..extensions import db, mail
+from ..extensions import db, mail, socketio
 
 
 users = Blueprint('users', __name__)
@@ -28,7 +36,8 @@ def login():
       return redirect(url_for('users.login'))
 
     if check_password_hash(user.password, password):
-      login_user(user)
+      login_user(user, remember=True)
+      print(request.cookies.get('session'))
       flash(f'Successfully logged in as {user.screen_name}!', category='success')
       return redirect(url_for('main.home'))
     else:
@@ -52,7 +61,7 @@ def register():
     db.session.add(new_wall)
     db.session.commit()
 
-    login_user(new_user)
+    login_user(new_user, remember=True)
     flash(f'Account created for {form.screen_name.data}!', category='success')
     return redirect(url_for('main.home'))
   return render_template('register.html', form=form)
