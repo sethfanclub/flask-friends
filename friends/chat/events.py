@@ -1,20 +1,15 @@
+from os import name
 from flask import session, request
 from flask_login import current_user
-from flask_socketio import emit
+from flask_socketio import emit, send, join_room
 from ..extensions import socketio
 
 
-@socketio.on('connect')
-def test_connect():
-	print(request.cookies.get('session'))
-	emit('message', {'msg': 'User has connected'})
+@socketio.on('connect', namespace='/chatroom')
+def on_connect():
+	join_room('chatroom')
+	emit('message', {'text': f"{current_user.screen_name} has connected"}, room='chatroom')
 
-@socketio.on('message', namespace='/chatroom')
-def handle_message(in_data):
-	sender_name = 'Seth'
-	sender_pic_id = ''
-	out_data = {
-		'msg': f"{sender_name}: {in_data['msg']}",
-		'pic_id': sender_pic_id
-	}
-	emit('message', out_data)
+@socketio.on('send_message', namespace='/chatroom')
+def send_message(text):
+	emit('message', {'text': f"{current_user.screen_name}: {text}"}, room='chatroom')

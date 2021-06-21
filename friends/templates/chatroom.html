@@ -16,21 +16,26 @@
          </div>
       </div>
    </div>
-   <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
-   <script type="text/javascript">
+   <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+   <script type="text/javascript" charset="UTF-8">
       var socket
-      $(document).ready(function() {   
-         socket = io.connect('http://localhost:5000/chatroom')
-         
+      let messages = document.getElementById('messages')
+      let sendButton = document.getElementById('message-send')
+      document.addEventListener('DOMContentLoaded', function() {
+         socket = io.connect('http://'+document.domain+':'+location.port+'/chatroom')
          socket.on('message', function(data) {
-            $('#messages').append('<li>'+data.msg+'</li>')
-         })
-
-         $('#message-send').on('click', function() {
-            socket.emit('message', {msg: $('#message-input').val()})
-            $('#message-input').val('')
+            sendMessage(data.text)
          })
       })
-   </script>
+
+      sendButton.onclick = function() {
+            text = document.getElementById('message-input').value
+            socket.emit('send_message', text)
+      }
+      function sendMessage(text) {
+         newMessage = document.createElement('li')
+         newMessage.innerText = text
+         messages.appendChild(newMessage)
+      }
+    </script>
 {% endblock %}
