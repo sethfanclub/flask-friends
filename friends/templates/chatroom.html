@@ -17,25 +17,5 @@
       </div>
    </div>
    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
-   <script type="text/javascript" charset="UTF-8">
-      var socket
-      let messages = document.getElementById('messages')
-      let sendButton = document.getElementById('message-send')
-      document.addEventListener('DOMContentLoaded', function() {
-         socket = io.connect('http://'+document.domain+':'+location.port+'/chatroom')
-         socket.on('message', function(data) {
-            sendMessage(data.text)
-         })
-      })
-
-      sendButton.onclick = function() {
-            text = document.getElementById('message-input').value
-            socket.emit('send_message', text)
-      }
-      function sendMessage(text) {
-         newMessage = document.createElement('li')
-         newMessage.innerText = text
-         messages.appendChild(newMessage)
-      }
-    </script>
+   <script type="text/javascript" charset="UTF-8" src="{{ url_for('static', filename='js/chat-socket.js') }}"></script>
 {% endblock %}

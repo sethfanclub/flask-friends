@@ -12,14 +12,12 @@ from flask_mail import Message
 from werkzeug.security import generate_password_hash, check_password_hash
 import uuid
 from os import path, remove
-
+from . import users
 from .models import User
 from ..posts.models import Wall
 from .forms import SettingsForm, ChangePasswordForm, RegistrationForm, LoginForm, RequestResetForm, ResetPasswordForm
 from ..extensions import db, mail, socketio
 
-
-users = Blueprint('users', __name__)
 
 @users.route('/login', methods=['GET', 'POST'])
 def login():
@@ -152,8 +150,3 @@ def change_password():
       return redirect(url_for('views.change_password'))
 
   return render_template('change_password.html', form=form)
-
-
-@users.route('/file_uploads/images/<filename>')
-def get_image(filename):
-  return send_from_directory('file_uploads/images', filename)  
